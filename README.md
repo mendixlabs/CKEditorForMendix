@@ -10,7 +10,7 @@ For more information on contributing to this repository visit [Contributing to a
 
 Use this widget to add a full WYSIWYG editor for your entity attributes. This version has the ability to add links to that HTML that can run microflows.
 
-![test](/assets/icon.png)
+![test](https://github.com/mendix/CKEditorForMendix/raw/master/assets/icon.png)
  
 ## Description
 
