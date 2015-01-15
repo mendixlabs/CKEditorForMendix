@@ -17,3 +17,7 @@ Use this widget to add a full WYSIWYG editor for your entity attributes. This ve
 The CKEditor widget comes with the CKEditor viewer. This viewer will enable the posibility to reformat links to microflow links.
 
 ![test](https://github.com/mendix/CKEditorForMendix/raw/master/assets/ckeditor.png)
+
+![test](https://github.com/mendix/CKEditorForMendix/raw/master/assets/mendix_button.png)
+
+![test](https://github.com/mendix/CKEditorForMendix/raw/master/assets/microflow_executed.png)
