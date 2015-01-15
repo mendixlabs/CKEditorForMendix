@@ -19,21 +19,22 @@ CKEDITOR.dialog.add( 'mendixlinkDialog', function( editor ) {
                         id: 'mxlinklabel',
                         label: 'Label of link',
                         
-                        setup: function( element ) {
-                            this.setValue( element.getText() );
+                        setup: function (element) {
+                            this.setValue(element.getText());
                         },
 
-                        commit: function( element ) {
-                            element.setText( this.getValue() );
+                        commit: function (element) {
+                            element.setText(this.getValue());
                         }
                     },{
                         type: 'select',
                         id: 'mxlink',
-                        label: 'Name of link',
-                        items: (function(){
+                        label: 'Microflow with name to execute',
+                        items: (function () {
                             var data = [],
                                 i = null;
                             
+                            // Create an array that contains all the values a person can pick.
                             if ( typeof editor.mendixWidgetConfig !== 'undefined' && typeof editor.mendixWidgetConfig.microflowLinks !== 'undefined' ){
                                 console.log(editor);
                                 
@@ -42,31 +43,42 @@ CKEDITOR.dialog.add( 'mendixlinkDialog', function( editor ) {
                                 }
                                 
                             }
-                            console.log(data);
                             
                             return data;
                             
                         }()),
                         'default': '',
                         
-                        setup: function( element ) {
-                            this.setValue( element.getAttribute('onclick').split('CKEditorViewer.mf.exec(\'').join('').split('\', \'__ID__\', \'__GUID__\');').join('') );
+                        setup: function(element) {
+                            // Get the value set on the link.
+                            
+                            if (typeof element.$ !== 'undefined'){
+                                var onclickValue = element.$.attributes['data-cke-pa-onclick'].value;
+                                this.setValue(onclickValue.split('CKEditorViewer.mf.exec(\'').join('').split('\', \'__ID__\', \'__GUID__\');').join(''));
+                            } else {
+                                this.setValue(element.getAttribute('onclick').split('CKEditorViewer.mf.exec(\'').join('').split('\', \'__ID__\', \'__GUID__\');').join(''));
+                            }
                         },
 
-                        commit: function( element ) {
-                            element.setAttribute( 'onclick', 'CKEditorViewer.mf.exec(\'' + this.getValue() + '\', \'__ID__\', \'__GUID__\');' );
+                        commit: function(element) {
+                            // Set the value on the link  
+                            element.setAttribute('href', '__LINK__');
+                            element.setAttribute('onclick', 'CKEditorViewer.mf.exec(\'' + this.getValue() + '\', \'__ID__\', \'__GUID__\');');
                         }
                     },
                     {
                         type: 'text',
                         id: 'mxclass',
                         label: 'CSS Classes on link',
+                        'default': 'btn btn-default mx-button',
                         
                         setup: function (element) {
+                            // Get the value of the class attribute of the link.
                             this.setValue(element.getAttribute('class').split('mx-microflow-link').join(''));
                         },
 
                         commit: function (element) {
+                            // Set the value of the class attribute of the link.
                             element.setAttribute('class' , this.getValue() + ' mx-microflow-link');
                         }
                     },
@@ -76,10 +88,12 @@ CKEDITOR.dialog.add( 'mendixlinkDialog', function( editor ) {
                         label: 'Title text on link',
                         
                         setup: function (element) {
+                            // Get the value of the title attribute of the link.
                             this.setValue(element.getAttribute('title'));
                         },
 
                         commit: function (element) {
+                            // Set the value of the title attribute of the link.
                             element.setAttribute('title' , this.getValue());
                         }
                     }
@@ -92,11 +106,11 @@ CKEDITOR.dialog.add( 'mendixlinkDialog', function( editor ) {
                 element = selection.getStartElement(),
                 className = '';
 
-            if ( element ) {
-                element = element.getAscendant( 'a', true );
+            if (element) {
+                element = element.getAscendant('a', true);
             }
 
-            if ( !element || element.getName() !== 'a' ) {
+            if (!element || element.getName() !== 'a') {
                 element = editor.document.createElement( 'a' );
                 element.setAttribute('class', 'mx-microflow-link');
                 this.insertMode = true;
@@ -106,18 +120,18 @@ CKEDITOR.dialog.add( 'mendixlinkDialog', function( editor ) {
             }
 
             this.element = element;
-            if ( !this.insertMode ) {
-                this.setupContent( this.element );
+            if (!this.insertMode) {
+                this.setupContent(this.element);
             }
         },
 
         onOk: function() {
             var dialog = this,
                 mxEl = this.element;
-            this.commitContent( mxEl );
+            this.commitContent(mxEl);
 
             if ( this.insertMode ) {
-                editor.insertElement( mxEl );
+                editor.insertElement(mxEl);
             }
         }
     };

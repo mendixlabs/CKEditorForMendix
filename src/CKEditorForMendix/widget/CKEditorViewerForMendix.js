@@ -253,13 +253,16 @@
             _loadData: function () {
 
                 var $ = this.$,
-                    html = this._contextObj.get(this.messageString);
+                    html = this._contextObj.get(this.messageString),
+                    name = Date.now();
                 
                 // Set the content of the link.
                 window.CKEditorViewer.data[this.id] = {};
                 window.CKEditorViewer.data[this.id].microflowLinks = this.microflowLinks;
                 
                 // Replace the html with the constant variables.
+                
+                html = html.split('__LINK__').join('#' + name + '" name="' + name + '"');
                 html = html.split('__ID__').join(window.CKEditorViewer.base64.encode(this.id));
                 html = html.split('__GUID__').join(window.CKEditorViewer.base64.encode(this._contextObj.getGuid()));
                 

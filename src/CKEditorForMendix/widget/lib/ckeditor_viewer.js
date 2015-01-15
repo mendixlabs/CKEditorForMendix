@@ -111,28 +111,30 @@ define([], function () {
 
                                 console.log('CKEditorViewer - finding microflow...');
 
-                                for (i = 0; i < window.CKEditorViewer.data[id].microflowLinks.length; i++) {
-                                    functionName = window.CKEditorViewer.data[id].microflowLinks[i].functionNames;
-                                    mfName = window.CKEditorViewer.data[id].microflowLinks[i].mfName;
-                                    if (functionName === mf) {
-                                        console.log('CKEditorViewer - executing: ' + mf + ' - MF - ' + mfName + ' - GUID - ' + guid + ' - ID -' + id);
+                                if (typeof window.CKEditorViewer.data[id] !== 'undefined') {
+                                    for (i = 0; i < window.CKEditorViewer.data[id].microflowLinks.length; i++) {
+                                        functionName = window.CKEditorViewer.data[id].microflowLinks[i].functionNames;
+                                        mfName = window.CKEditorViewer.data[id].microflowLinks[i].mfName;
+                                        if (functionName === mf) {
+                                            console.log('CKEditorViewer - executing: ' + mf + ' - MF - ' + mfName + ' - GUID - ' + guid + ' - ID -' + id);
 
-                                        mx.data.action({
-                                            params: {
-                                                applyto: "selection",
-                                                actionname: mfName,
-                                                guids: [guid],
-                                            },
-                                            callback: function (obj) {
-                                                console.log('CKEditorViewer - executed');
-                                            },
-                                            error: function (error) {
-                                                console.log('CKEditorViewer - error - ' + error);
-                                            }
-                                        }, this);
+                                            mx.data.action({
+                                                params: {
+                                                    applyto: "selection",
+                                                    actionname: mfName,
+                                                    guids: [guid],
+                                                },
+                                                callback: function (obj) {
+                                                    console.log('CKEditorViewer - executed');
+                                                },
+                                                error: function (error) {
+                                                    console.log('CKEditorViewer - error - ' + error);
+                                                }
+                                            }, this);
 
 
-                                        break;
+                                            break;
+                                        }
                                     }
                                 }
 
