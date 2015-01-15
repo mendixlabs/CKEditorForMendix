@@ -1,14 +1,6 @@
-# App Store Widget Boilerplate
+# CKEditor for Mendix
 
-This boilerplate gives you all you need to start a new custom widget for Mendix 5.
-
-The boilerplate contains:
-
-- Directory structure.
-- Readme.md file.
-- License.
-- Javascript source.
-- XSD for package.xml, to configure properties of the widget, visible inside de Mendix business modeler.
+This widget gives you a full version of the CKEditor with an extra button that allows you to create microflow links inside your HTML output.
 
 ## Contributing
 
@@ -16,18 +8,9 @@ For more information on contributing to this repository visit [Contributing to a
 
 ## Typical usage scenario
 
-Use this template to start building a widget for Mendix 5.
-Alter this README.md file and describe what your widget does.
+Use this widget to add a full WYSIWYG editor for your entity attributes. This version has the ability to add links to that HTML that can run microflows.
+
+![test](/assets/icon.png)
  
 ## Description
 
-The javascript inside the widget has examples of:
-
-- Using CSS within a Widget.
-- Using templating.
-- Loading external library's.
-- DOM manipulation.
-- Event attaching.
-- Loading data.
-- Executing microflow and sending data.
-- Working with the context object (The object that is send by a contextview , for instance a dataview).
