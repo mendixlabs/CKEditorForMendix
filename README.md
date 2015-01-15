@@ -8,9 +8,8 @@ For more information on contributing to this repository visit [Contributing to a
 
 ## Typical usage scenario
 
-Use this widget to add a full WYSIWYG editor for your entity attributes. This version has the ability to add links to that HTML that can run microflows.
-
-![test](https://github.com/mendix/CKEditorForMendix/raw/master/assets/icon.png)
+Use this widget to add a full WYSIWYG editor for your entity attributes. This version has the ability to add links to HTML that can run microflows when clicked uppon.
  
 ## Description
 
+The CKEditor widget comes with the CKEditor viewer. This viewer will enable the posibility to reformat links to microflow links.
