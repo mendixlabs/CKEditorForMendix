@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<clsMXWidgetSettings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <WidgetName>ckeditorformendix</WidgetName>
+  <SourcePath>C:\Projects\GitHub\ckeditorformendix\ckeditorformendix\src\</SourcePath>
+  <DestinationPath>C:\Projects\GitHub\ckeditorformendix\ckeditorformendix\test\</DestinationPath>
+  <Monitor>false</Monitor>
+</clsMXWidgetSettings>
