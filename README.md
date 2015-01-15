@@ -2,6 +2,8 @@
 
 This widget gives you a full version of the CKEditor with an extra button that allows you to create microflow links inside your HTML output.
 
+![test](https://github.com/mendix/CKEditorForMendix/raw/master/assets/mendix_button.png)
+
 ## Contributing
 
 For more information on contributing to this repository visit [Contributing to a GitHub repository](https://world.mendix.com/display/howto50/Contributing+to+a+GitHub+repository)!
