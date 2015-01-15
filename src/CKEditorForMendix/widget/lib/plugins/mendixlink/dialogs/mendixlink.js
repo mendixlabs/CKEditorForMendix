@@ -1,4 +1,9 @@
+/*jslint white:true, nomen: true, plusplus: true */
+/*global mx, mxui, mendix, dojo, require, console, define, module, logger, document, window, CKEDITOR */
+/*mendix */
 CKEDITOR.dialog.add( 'mendixlinkDialog', function( editor ) {
+    'use strict';
+    
     return {
         title: 'Mendix Link Properties',
         minWidth: 400,
@@ -45,11 +50,37 @@ CKEDITOR.dialog.add( 'mendixlinkDialog', function( editor ) {
                         'default': '',
                         
                         setup: function( element ) {
-                            this.setValue( element.getAttribute('href').split('javascript:CKEditorViewer.mf.exec(\'').join('').split('\', \'__ID__\', \'__GUID__\');').join('') );
+                            this.setValue( element.getAttribute('onclick').split('CKEditorViewer.mf.exec(\'').join('').split('\', \'__ID__\', \'__GUID__\');').join('') );
                         },
 
                         commit: function( element ) {
-                            element.setAttribute( 'href', 'javascript:CKEditorViewer.mf.exec(\'' + this.getValue() + '\', \'__ID__\', \'__GUID__\');' );
+                            element.setAttribute( 'onclick', 'CKEditorViewer.mf.exec(\'' + this.getValue() + '\', \'__ID__\', \'__GUID__\');' );
+                        }
+                    },
+                    {
+                        type: 'text',
+                        id: 'mxclass',
+                        label: 'CSS Classes on link',
+                        
+                        setup: function (element) {
+                            this.setValue(element.getAttribute('class').split('mx-microflow-link').join(''));
+                        },
+
+                        commit: function (element) {
+                            element.setAttribute('class' , this.getValue() + ' mx-microflow-link');
+                        }
+                    },
+                    {
+                        type: 'text',
+                        id: 'mxtitle',
+                        label: 'Title text on link',
+                        
+                        setup: function (element) {
+                            this.setValue(element.getAttribute('title'));
+                        },
+
+                        commit: function (element) {
+                            element.setAttribute('title' , this.getValue());
                         }
                     }
                 ]
@@ -57,15 +88,15 @@ CKEDITOR.dialog.add( 'mendixlinkDialog', function( editor ) {
         ],
 
         onShow: function() {
-            var selection = editor.getSelection();
-            var element = selection.getStartElement();
-            var className = '';
+            var selection = editor.getSelection(),
+                element = selection.getStartElement(),
+                className = '';
 
             if ( element ) {
                 element = element.getAscendant( 'a', true );
             }
 
-            if ( !element || element.getName() != 'a' ) {
+            if ( !element || element.getName() !== 'a' ) {
                 element = editor.document.createElement( 'a' );
                 element.setAttribute('class', 'mx-microflow-link');
                 this.insertMode = true;
@@ -75,17 +106,19 @@ CKEDITOR.dialog.add( 'mendixlinkDialog', function( editor ) {
             }
 
             this.element = element;
-            if ( !this.insertMode )
+            if ( !this.insertMode ) {
                 this.setupContent( this.element );
+            }
         },
 
         onOk: function() {
-            var dialog = this;
-            var mxEl = this.element;
+            var dialog = this,
+                mxEl = this.element;
             this.commitContent( mxEl );
 
-            if ( this.insertMode )
+            if ( this.insertMode ) {
                 editor.insertElement( mxEl );
+            }
         }
     };
 });
