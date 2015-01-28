@@ -54,7 +54,7 @@
             _settings: null,
 
             // Template path
-            templatePath: dojo.moduleUrl('CKEditorForMendix', 'widget/templates/ckeditorformendix.html'),
+            templatePath: dojo.moduleUrl('CKEditorForMendix', 'widget/templates/CKEditorForMendix.html'),
 
             /**
              * Mendix Widget methods.

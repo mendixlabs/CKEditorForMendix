@@ -5,13 +5,13 @@ For licensing, see LICENSE.md or http://ckeditor.com/license
 (function(){
     console.log('CKEDITOR SCRIPT LOADING.');
     if (typeof window.mxmob !== 'undefined'){
-        window.CKEDITOR_BASEPATH = window.mxmob.app._currentURL + 'widgets/ckeditorformendix/widget/lib/';
+        window.CKEDITOR_BASEPATH = window.mxmob.app._currentURL + 'widgets/CKEditorForMendix/widget/lib/';
         window.mxmob.ui.alert(window.CKEDITOR_BASEPATH);
     } else {
         if (typeof window.mxapp !== 'undefined') {
-            window.CKEDITOR_BASEPATH = window.mxapp._appUrl + 'widgets/ckeditorformendix/widget/lib/';
+            window.CKEDITOR_BASEPATH = window.mxapp._appUrl + 'widgets/CKEditorForMendix/widget/lib/';
         } else {
-            window.CKEDITOR_BASEPATH = mx.appUrl + 'widgets/ckeditorformendix/widget/lib/';
+            window.CKEDITOR_BASEPATH = mx.appUrl + 'widgets/CKEditorForMendix/widget/lib/';
         }
     }
 }());
