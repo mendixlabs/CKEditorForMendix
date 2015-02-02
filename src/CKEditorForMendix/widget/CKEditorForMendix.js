@@ -7,7 +7,7 @@
 	========================
 
 	@file      : ckeditorformendix.js
-	@version   : 1.0
+	@version   : 1.1
 	@author    : Gerhard Richard Edens
 	@date      : 22-08-2014
 	@copyright : Mendix Technology BV
@@ -65,7 +65,7 @@
             postCreate: function () {
 
                 // postCreate
-                console.log('ckeditorformendix - postCreate');
+                console.debug('ckeditorformendix - postCreate');
 
                 // Load CSS ... automaticly from ui directory
 
@@ -77,9 +77,6 @@
 
                 // Setup events
                 this._setupEvents();
-
-                // Show message
-                this._showMessage();
 
             },
 
@@ -97,7 +94,7 @@
             update: function (obj, callback) {
 
                 // startup
-                console.log('ckeditorformendix - update');
+                console.debug('ckeditorformendix - update');
 
                 // Release handle on previous object, if any.
                 if (this._handle) {
@@ -187,7 +184,7 @@
             },
 
             _editorChange: function (data) {
-                console.log('ckeditorformendix - content has changed. - ' + data);
+                console.debug('ckeditorformendix - content has changed. - ' + data);
                 if (this._contextObj !== null) {
                     this._contextObj.set(this.messageString, data);
                 }
@@ -214,7 +211,7 @@
                         seperator1 = null,
                         seperator2 = null;
                     
-                    console.log('ckeditorformendix - BASEPATH - ' + window.CKEDITOR_BASEPATH);
+                    console.debug('ckeditorformendix - BASEPATH - ' + window.CKEDITOR_BASEPATH);
                     
                     // Create new config!
                     this._settings = [];
@@ -316,8 +313,11 @@
                         this._editorChange(this._editor.getData());
                     }));
 
-                    console.log('ckeditorformendix - createChildNodes events');
-                    console.log('ckeditorformendix - added');
+					// in case of data not loaded into editor, because editor not ready
+					dojo.hitch(this,this._loadData());
+					
+                    console.debug('ckeditorformendix - createChildNodes events');
+                    console.debug('ckeditorformendix - added');
                 
                 }));
                 
@@ -326,7 +326,7 @@
             // Attach events to newly created nodes.
             _setupEvents: function () {
 
-                console.log('ckeditorformendix - setup events');
+                console.debug('ckeditorformendix - setup events');
 
             },
 
@@ -338,18 +338,17 @@
             _loadData: function () {
 
                 // TODO, get aditional data from mendix.
-                console.log(this._contextObj.get(this.messageString));
+                console.debug(this._contextObj.get(this.messageString));
                 
                 if (this._editor !== null) {
                     this._editor.setData(this._contextObj.get(this.messageString));
                 }
+				else
+				{
+					console.info('ckeditorformendix - Unable to add contents to editor, no _editor object available');
+				}
 
             },
-
-            _showMessage: function () {
-                console.log(this.messageString);
-            }
-
         });
     });
 
