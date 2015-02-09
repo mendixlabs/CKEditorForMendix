@@ -61,9 +61,6 @@ require({
 			// Create childnodes
 			this._createChildNodes();
 
-			// Setup events
-			this._setupEvents();
-
 		},
 
 		// DOJO.WidgetBase -> Startup is fired after the properties of the widget are set.
@@ -110,7 +107,7 @@ require({
 							callback: lang.hitch(this, function (objs) {
 
 								// Set the object as background.
-								this._contextObj = objs;
+								this._contextObj = objs[0];
 
 								// Load data again.
 								this._loadData();
@@ -152,7 +149,6 @@ require({
 
 			// To be able to just alter one variable in the future we set an internal variable with the domNode that this widget uses.
 			this._wgtNode = this.domNode;
-
 		},
 
 		_editorChange: function (data) {
@@ -165,9 +161,6 @@ require({
 		// Create child nodes.
 		_createChildNodes: function () {
 
-			// Assigning externally loaded library to internal variable inside function.
-			var $ = this.$;
-
 			// Example setting message
 			this.domNode.appendChild(mxui.dom.create('textarea', {
 				'name': 'html_editor_' + this.id,
@@ -176,10 +169,7 @@ require({
 				'cols': '80'
 			}));
 
-			$(document).ready(lang.hitch(this, function () {
-
-				var $ = this.$,
-					editor = null,
+				var editor = null,
 					seperator1 = null,
 					seperator2 = null;
 
@@ -201,6 +191,13 @@ require({
 				// Autogrow functionality of the editor.
 				this._settings[this.id].config.autoGrow_minHeight = 300;
 				this._settings[this.id].config.autoGrow_onStartup = true;
+				if(this.width > 0) { 
+					this._settings[this.id].config.width = this.width;
+				}
+				if(this.height > 0) { 
+					this._settings[this.id].config.height = this.height;
+				}
+				
 
 				// Base URL inside CKEditor
 				this._settings[this.id].config.baseHref = mx.appUrl;
@@ -319,15 +316,6 @@ require({
 
 				console.debug('ckeditorformendix - createChildNodes events');
 				console.debug('ckeditorformendix - added');
-
-			}));
-
-		},
-
-		// Attach events to newly created nodes.
-		_setupEvents: function () {
-
-			console.debug('ckeditorformendix - setup events');
 
 		},
 

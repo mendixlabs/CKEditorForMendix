@@ -48,17 +48,6 @@ require({
 			// postCreate
 			console.log('CKEditorViewerForMendixNode - postCreate');
 
-			// Load CSS ... automaticly from ui directory
-
-			// Setup widgets
-			this._setupWidget();
-
-			// Create childnodes
-			this._createChildNodes();
-
-			// Setup events
-			this._setupEvents();
-
 			// Show message
 			this._showMessage();
 
@@ -193,46 +182,13 @@ require({
 			}
 		},
 
-
-		/**
-		 * Extra setup widget methods.
-		 * ======================
-		 */
-		_setupWidget: function () {
-
-			// Setup jQuery
-			this.$ = _jQuery().jQuery();
-
-			// Load the CKEditorViewer code to execute a microflow.
-			_CKEditorViewer().viewer();
-
-		},
-
-
-		// Create child nodes.
-		_createChildNodes: function () {
-
-			// Assigning externally loaded library to internal variable inside function.
-			var $ = this.$;
-
-		},
-
-		// Attach events to newly created nodes.
-		_setupEvents: function () {
-
-			console.log('CKEditorViewerForMendixNode - setup events');
-
-		},
-
-
 		/**
 		 * Interaction widget methods.
 		 * ======================
 		 */
 		_loadData: function () {
 
-			var $ = this.$,
-				html = this._contextObj.get(this.messageString),
+			var html = this._contextObj.get(this.messageString),
 				name = Date.now();
 
 			// Set the content of the link.
@@ -251,10 +207,8 @@ require({
 		},
 
 		_showMessage: function () {
-			console.log(this.messageString);
+			console.debug(this.messageString);
 		}
 
 	});
 });
-
-}());

@@ -7,9 +7,9 @@
   
       <properties>
         <property key="messageString" type="attribute" defaultValue="">
-            <caption>Message string</caption>
+            <caption>Content attribute</caption>
 			<category>Data source</category>
-			<description>Add the attribute with the content.</description>
+			<description>Add the attribute containing the contents to display.</description>
 			<attributeTypes>
 				<attributeType name="String"/>
 			</attributeTypes>
