@@ -1,5 +1,5 @@
 /*jslint white:true, nomen: true, plusplus: true */
-/*global mx, mxui, document, define, require, browser, devel, console, window */
+/*global mx, mxui, document, define, require, browser, devel, console, window, dojo */
 /*mendix */
 
 // Required module list. Remove unnecessary modules, you can always get them back from the boilerplate.
@@ -23,19 +23,16 @@ require({
 	// Declare widget.
 	return declare('CKEditorForMendix.widget.CKEditorViewerForMendix', [_WidgetBase, _TemplatedMixin], {
 
+		// Template path
+		templateString: widgetTemplate,
+		
 		/**
 		 * Internal variables.
 		 * ======================
 		 */
-		_contextGuid: null,
 		_contextObj: null,
 		_handle: null,
 
-		// CKEditor instances.
-		_settings: null,
-
-		// Template path
-		templateString: widgetTemplate,
 
 		/**
 		 * Mendix Widget methods.
@@ -48,65 +45,6 @@ require({
 			// postCreate
 			console.log('CKEditorViewerForMendixNode - postCreate');
 
-			// Show message
-			this._showMessage();
-
-		},
-
-		// DOJO.WidgetBase -> Startup is fired after the properties of the widget are set.
-		startup: function () {
-
-			// postCreate
-			console.log('CKEditorViewerForMendixNode - startup');
-
-		},
-
-		applyContext: function (context, callback) {
-
-			// Release handle on previous object, if any.
-			if (this._handle) {
-				mx.data.unsubscribe(this._handle);
-			}
-
-			// Subscribe to object updates.
-			this._handle = mx.data.subscribe({
-				guid: context.getTrackId(),
-				callback: dojo.hitch(this, function (obj) {
-
-					mx.data.get({
-						guids: [obj],
-						callback: dojo.hitch(this, function (objs) {
-
-							// Set the object as background.
-							this._contextObj = objs[0];
-
-							// Load data again.
-							this._loadData();
-
-						})
-					});
-
-				})
-			});
-
-			mx.data.get({
-				guids: [context.getTrackId()],
-				callback: dojo.hitch(this, function (callback, objs) {
-
-					// Set the object as background.
-					this._contextObj = objs[0];
-
-					// Load data again.
-					this._loadData();
-
-					// Execute callback.
-					if (typeof callback !== 'undefined') {
-						callback();
-					}
-
-				}, callback)
-			});
-
 		},
 
 		/**
@@ -116,51 +54,13 @@ require({
 
 			// startup
 			console.log('CKEditorViewerForMendixNode - update');
-
-			// Release handle on previous object, if any.
-			if (this._handle) {
-				mx.data.unsubscribe(this._handle);
-			}
-
-			if (obj === null) {
-
-				// Sorry no data no show!
-				console.log('CKEditorViewerForMendixNode - update - We did not get any context object!');
-
-			} else {
-
-				// Set object internally
-				this._contextObj = obj;
-
-				// Load data
-				this._loadData();
-
-				// Subscribe to object updates.
-				this._handle = mx.data.subscribe({
-					guid: this._contextObj.getGuid(),
-					callback: dojo.hitch(this, function (obj) {
-
-						mx.data.get({
-							guids: [obj],
-							callback: dojo.hitch(this, function (objs) {
-
-								// Set the object as background.
-								this._contextObj = objs;
-
-								// Load data again.
-								this._loadData();
-
-							})
-						});
-
-					})
-				});
-			}
+			
+			this._contextObj = obj;
+			this._resetSubscriptions();
+			this._updateRendering();
 
 			// Execute callback.
-			if (typeof callback !== 'undefined') {
-				callback();
-			}
+			callback();
 		},
 
 		/**
@@ -177,16 +77,13 @@ require({
 
 		uninitialize: function () {
 			//TODO, clean up only events
-			if (this._handle) {
-				mx.data.unsubscribe(this._handle);
-			}
 		},
 
 		/**
 		 * Interaction widget methods.
 		 * ======================
 		 */
-		_loadData: function () {
+		_updateRendering: function () {
 
 			var html = this._contextObj.get(this.messageString),
 				name = Date.now();
@@ -206,8 +103,19 @@ require({
 
 		},
 
-		_showMessage: function () {
-			console.debug(this.messageString);
+		_resetSubscriptions: function () {
+			// Release handle on previous object, if any.
+			if (this._handle) {
+				this.unsubscribe(this._handle);
+				this._handle = null;
+			}
+
+			if (this._contextObj) {
+				this._handle = this.subscribe({
+					guid: this._contextObj.getGuid(),
+					callback: this._updateRendering
+				});
+			}
 		}
 
 	});
