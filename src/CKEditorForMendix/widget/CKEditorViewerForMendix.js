@@ -31,7 +31,7 @@ require({
 		 * ======================
 		 */
 		_contextObj: null,
-		_handle: null,
+		_handles: null,
 
 
 		/**
@@ -85,36 +85,58 @@ require({
 		 */
 		_updateRendering: function () {
 
-			var html = this._contextObj.get(this.messageString),
-				name = Date.now();
+			if(this._contextObj) {
+				
+				domStyle.set(this.domNode, "display", "initial");
+				var html = this._contextObj.get(this.messageString),
+					name = Date.now();
 
-			// Set the content of the link.
-			window.CKEditorViewer.data[this.id] = {};
-			window.CKEditorViewer.data[this.id].microflowLinks = this.microflowLinks;
+				// Set the content of the link.
+				window.CKEditorViewer.data[this.id] = {};
+				window.CKEditorViewer.data[this.id].microflowLinks = this.microflowLinks;
 
-			// Replace the html with the constant variables.
+				// Replace the html with the constant variables.
 
-			html = html.split('__LINK__').join('#' + name + '" name="' + name + '"');
-			html = html.split('__ID__').join(window.CKEditorViewer.base64.encode(this.id));
-			html = html.split('__GUID__').join(window.CKEditorViewer.base64.encode(this._contextObj.getGuid()));
+				html = html.split('__LINK__').join('#' + name + '" name="' + name + '"');
+				html = html.split('__ID__').join(window.CKEditorViewer.base64.encode(this.id));
+				html = html.split('__GUID__').join(window.CKEditorViewer.base64.encode(this._contextObj.getGuid()));
 
-			$(this.domNode).html('');
-			$(this.domNode).append(html);
-
+				$(this.domNode).html('');
+				$(this.domNode).append(html);
+			}
+			else {
+				domStyle.set(this.domNode, "display", "none");
+			}
 		},
 
 		_resetSubscriptions: function () {
-			// Release handle on previous object, if any.
-			if (this._handle) {
-				this.unsubscribe(this._handle);
-				this._handle = null;
+			var objHandle = null, 
+				attrHandle = null;
+
+			// Release handles on previous object, if any.
+			if(this._handles){
+				this._handles.forEach(function (handle, i) {
+					mx.data.unsubscribe(handle);
+				});
 			}
 
 			if (this._contextObj) {
-				this._handle = this.subscribe({
+				objHandle = this.subscribe({
 					guid: this._contextObj.getGuid(),
-					callback: this._updateRendering
+					callback: lang.hitch(this,function(guid) {
+						this._updateRendering();
+					})
 				});
+
+				attrHandle = this.subscribe({
+					guid: this._contextObj.getGuid(),
+					attr: this.messageString,
+					callback: lang.hitch(this,function(guid,attr,attrValue) {
+						this._updateRendering();
+					})
+				});
+
+				this._handles = [objHandle, attrHandle];
 			}
 		}
 

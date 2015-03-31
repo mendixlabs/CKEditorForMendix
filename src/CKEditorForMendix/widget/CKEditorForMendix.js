@@ -30,7 +30,8 @@ require({
 		_wgtNode: null,
 		_contextGuid: null,
 		_contextObj: null,
-		_handle: null,
+		_handles: null,
+		_alertdiv : null,
 
 		// Extra variables
 		_extraContentDiv: null,
@@ -59,7 +60,9 @@ require({
 			this._setupWidget();
 
 			// Create childnodes
-			this._createChildNodes();
+			if(!this.readOnly) {
+				this._createChildNodes();
+			}
 
 		},
 
@@ -79,50 +82,12 @@ require({
 			// startup
 			console.debug('ckeditorformendix - update');
 
-			// Release handle on previous object, if any.
-			if (this._handle) {
-				mx.data.unsubscribe(this._handle);
-			}
-
-			if (obj === null) {
-
-				// Sorry no data no show!
-				console.log('ckeditorformendix - update - We did not get any context object!');
-
-			} else {
-
-				// Set object internally
-				this._contextObj = obj;
-
-				// Load data
-				this._loadData();
-
-				// Subscribe to object updates.
-				this._handle = mx.data.subscribe({
-					guid: this._contextObj.getGuid(),
-					callback: lang.hitch(this, function (obj) {
-
-						mx.data.get({
-							guids: [obj],
-							callback: lang.hitch(this, function (objs) {
-
-								// Set the object as background.
-								this._contextObj = objs[0];
-
-								// Load data again.
-								this._loadData();
-
-							})
-						});
-
-					})
-				});
-			}
-
-			// Execute callback.
-			if (typeof callback !== 'undefined') {
-				callback();
-			}
+			this._contextObj = obj;
+			this._resetSubscriptions();
+			this._updateRendering();
+			
+			callback();
+			
 		},
 
 		enable: function () {
@@ -134,10 +99,7 @@ require({
 		},
 
 		uninitialize: function () {
-			//TODO, clean up only events
-			if (this._handle) {
-				mx.data.unsubscribe(this._handle);
-			}
+
 		},
 
 
@@ -312,29 +274,102 @@ require({
 				}));
 
 				// in case of data not loaded into editor, because editor not ready
-				lang.hitch(this, this._loadData());
+				lang.hitch(this, this._updateRendering());
 
 				console.debug('ckeditorformendix - createChildNodes events');
 				console.debug('ckeditorformendix - added');
 
 		},
 
+		_handleValidation: function(validations) {
+			this._clearValidations();
 
+			var val = validations[0],
+				msg = val.getReasonByAttribute(this.messageString);    
+
+			if(this.readOnly){
+				val.removeAttribute(this.messageString);
+			} else {                                
+				if (msg) {
+					this._addValidation(msg);
+					val.removeAttribute(this.messageString);
+				}
+			}
+		},
+
+		_clearValidations: function() {
+			domConstruct.destroy(this._alertdiv);
+		},
+
+		_addValidation : function(msg) {
+			this._alertdiv = domConstruct.create("div", { 
+				class : 'alert alert-danger',
+				innerHTML: msg });
+
+			this.domNode.appendChild(this._alertdiv);
+
+		},
+		
 		/**
 		 * Interaction widget methods.
 		 * ======================
 		 */
-		_loadData: function () {
+		_updateRendering: function () {
 
-			// TODO, get aditional data from mendix.
-			console.debug(this._contextObj.get(this.messageString));
+			if(this._contextObj) {			
+				console.debug(this._contextObj.get(this.messageString));
 
-			if (this._editor !== null) {
-				this._editor.setData(this._contextObj.get(this.messageString));
-			} else {
-				console.info('ckeditorformendix - Unable to add contents to editor, no _editor object available');
+				domStyle.set(this.domNode, "display", "initial");
+				
+				if (this._editor !== null) {
+					this._editor.setData(this._contextObj.get(this.messageString));
+				} else {
+					console.info('ckeditorformendix - Unable to add contents to editor, no _editor object available');
+				}
+			}
+			else {
+				domStyle.set(this.domNode, "display", "none");
+			}
+		},
+		_resetSubscriptions: function () {
+			var objHandle = null, 
+				attrHandle = null, 
+				validationHandle = null;
+
+			// Release handles on previous object, if any.
+			if(this._handles){
+				this._handles.forEach(function (handle, i) {
+					mx.data.unsubscribe(handle);
+				});
 			}
 
-		},
+			if (this._contextObj) {
+				objHandle = this.subscribe({
+					guid: this._contextObj.getGuid(),
+					callback: lang.hitch(this,function(guid) {
+						this._updateRendering();
+					})
+				});
+				
+//				attrHandle = this.subscribe({
+//					guid: this._contextObj.getGuid(),
+//					attr: this.messageString,
+//					callback: lang.hitch(this,function(guid,attr,attrValue) {
+//						this._updateRendering();
+//					})
+//				});
+
+				validationHandle = mx.data.subscribe({
+					guid     : this._contextObj.getGuid(),
+					val      : true,
+					callback : lang.hitch(this,this._handleValidation)
+				});
+
+				this._handles = [objHandle, attrHandle, validationHandle];
+			}
+		}
 	});
 });
+
+
+
