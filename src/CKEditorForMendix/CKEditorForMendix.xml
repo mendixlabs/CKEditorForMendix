@@ -15,9 +15,9 @@
 			</attributeTypes>
 		</property>
 		<property key="onChangeMicroflow" type="microflow" required="false">
-			<caption>Onchange Microflow</caption>
+			<caption>On key press Microflow</caption>
 			<category>Behavior</category>
-			<description>Microflow to trigger on change.</description>
+			<description>Microflow which is triggered when a key press event occurs.</description>
 			<returnType type="Void" />
 		</property>
 		<property key="toolbarDocument" type="boolean" required="true" defaultValue="true">

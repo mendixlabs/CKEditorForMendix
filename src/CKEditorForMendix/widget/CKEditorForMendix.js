@@ -62,6 +62,7 @@ require({
 			// Create childnodes
 			if(!this.readOnly) {
 				this._createChildNodes();
+				this._setupEvents();
 			}
 
 		},
@@ -102,7 +103,6 @@ require({
 
 		},
 
-
 		/**
 		 * Extra setup widget methods.
 		 * ======================
@@ -113,6 +113,29 @@ require({
 			this._wgtNode = this.domNode;
 		},
 
+		_setupEvents: function () {
+			// Handle change event of content!
+			this._editor.on('change', lang.hitch(this, function () {
+				this._editorChange(this._editor.getData());
+				
+				if(this.onChangeMicroflow) {
+					mx.data.action({
+						params: {
+							applyto: 'selection',
+							actionname: this.onChangeMicroflow,
+							guids: [this._contextObj.getGuid()]
+						},
+						callback: function (obj) {
+							//TODO what to do when all is ok!
+						},
+						error: function (error) {
+							console.log(this.id + ': An error occurred while executing microflow: ' + error.description);
+						}
+					}, this);
+				}
+			}));
+		},
+		
 		_editorChange: function (data) {
 			console.debug('ckeditorformendix - content has changed. - ' + data);
 			if (this._contextObj !== null) {
@@ -268,12 +291,7 @@ require({
 					microflowLinks: this.microflowLinks
 				};
 
-				// Handle change event of content!
-				this._editor.on('change', lang.hitch(this, function () {
-					this._editorChange(this._editor.getData());
-				}));
-
-				// in case of data not loaded into editor, because editor not ready
+				// in case of data not loaded into editor, because editor was not ready
 				lang.hitch(this, this._updateRendering());
 
 				console.debug('ckeditorformendix - createChildNodes events');
