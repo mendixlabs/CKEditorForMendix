@@ -337,7 +337,7 @@ require({
 			if(this._contextObj) {			
 				console.debug(this._contextObj.get(this.messageString));
 
-				domStyle.set(this.domNode, "display", "initial");
+				domStyle.set(this.domNode, "visibility", "visible");
 				
 				if (this._editor !== null) {
 					this._editor.setData(this._contextObj.get(this.messageString));
@@ -346,7 +346,7 @@ require({
 				}
 			}
 			else {
-				domStyle.set(this.domNode, "display", "none");
+				domStyle.set(this.domNode, "visibility", "hidden");
 			}
 		},
 		_resetSubscriptions: function () {
