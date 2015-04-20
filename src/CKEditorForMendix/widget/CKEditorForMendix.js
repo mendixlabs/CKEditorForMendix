@@ -4,390 +4,411 @@
 
 // Required module list. Remove unnecessary modules, you can always get them back from the boilerplate.
 require({
-	packages: [{
-		name: 'jquery',
-		location: '../../widgets/CKEditorForMendix/widget/lib',
-		main: 'jquery'
-	},{
-		name: 'ckeditor',
-		location: '../../widgets/CKEditorForMendix/widget/lib',
-		main: 'ckeditor'
-	}]
+    packages: [{
+        name: 'jquery',
+        location: '../../widgets/CKEditorForMendix/widget/lib',
+        main: 'jquery'
+ }, {
+        name: 'ckeditor',
+        location: '../../widgets/CKEditorForMendix/widget/lib',
+        main: 'ckeditor'
+ }]
 }, [
-	'dojo/_base/declare', 'mxui/widget/_WidgetBase', 'dijit/_TemplatedMixin',
-	'mxui/dom', 'dojo/dom', 'dojo/query', 'dojo/dom-prop', 'dojo/dom-geometry', 'dojo/dom-class', 'dojo/dom-style', 'dojo/dom-construct', 'dojo/_base/array', 'dojo/_base/lang', 'dojo/text',
-	'jquery', 'ckeditor', 'dojo/text!CKEditorForMendix/widget/templates/CKEditorForMendix.html'
+ 'dojo/_base/declare', 'mxui/widget/_WidgetBase', 'dijit/_TemplatedMixin',
+ 'mxui/dom', 'dojo/dom', 'dojo/query', 'dojo/dom-prop', 'dojo/dom-geometry', 'dojo/dom-class', 'dojo/dom-style', 'dojo/dom-construct', 'dojo/_base/array', 'dojo/_base/lang', 'dojo/text',
+ 'jquery', 'ckeditor', 'dojo/text!CKEditorForMendix/widget/templates/CKEditorForMendix.html'
 ], function (declare, _WidgetBase, _TemplatedMixin, dom, dojoDom, domQuery, domProp, domGeom, domClass, domStyle, domConstruct, dojoArray, lang, text, $, _CKEditor, widgetTemplate) {
-	'use strict';
+    'use strict';
 
-	// Declare widget.
-	return declare('CKEditorForMendix.widget.CKEditorForMendix', [_WidgetBase, _TemplatedMixin], {
+    // Declare widget.
+    return declare('CKEditorForMendix.widget.CKEditorForMendix', [_WidgetBase, _TemplatedMixin], {
 
-		/**
-		 * Internal variables.
-		 * ======================
-		 */
-		_wgtNode: null,
-		_contextGuid: null,
-		_contextObj: null,
-		_handles: null,
-		_alertdiv : null,
+        /**
+         * Internal variables.
+         * ======================
+         */
+        _wgtNode: null,
+        _contextGuid: null,
+        _contextObj: null,
+        _handles: null,
+        _alertdiv: null,
 
-		// Extra variables
-		_extraContentDiv: null,
-		_editor: null,
+        // Extra variables
+        _extraContentDiv: null,
+        _editor: null,
 
-		// CKEditor instances.
-		_settings: null,
+        // CKEditor instances.
+        _settings: null,
 
-		// Template path
-		templateString: widgetTemplate,
+        // Template path
+        templateString: widgetTemplate,
 
-		/**
-		 * Mendix Widget methods.
-		 * ======================
-		 */
+        /**
+         * Mendix Widget methods.
+         * ======================
+         */
 
-		// DOJO.WidgetBase -> PostCreate is fired after the properties of the widget are set.
-		postCreate: function () {
 
-			// postCreate
-			console.debug('ckeditorformendix - postCreate');
+        //this._editor.checkDirty();
+        // DOJO.WidgetBase -> PostCreate is fired after the properties of the widget are set.
+        postCreate: function () {
 
-			// Load CSS ... automaticly from ui directory
+            // postCreate
+            console.debug('ckeditorformendix - postCreate');
 
-			// Setup widgets
-			this._setupWidget();
+            // Load CSS ... automaticly from ui directory
 
-			// Create childnodes
-			if(!this.readOnly) {
-				this._createChildNodes();
-				this._setupEvents();
-			}
+            // Setup widgets
+            this._setupWidget();
 
-		},
+            // Create childnodes
+            if (!this.readOnly) {
+                this._createChildNodes();
+                this._setupEvents();
+            }
 
-		// DOJO.WidgetBase -> Startup is fired after the properties of the widget are set.
-		startup: function () {
+        },
 
-			// postCreate
-			console.log('ckeditorformendix - startup');
+        // DOJO.WidgetBase -> Startup is fired after the properties of the widget are set.
+        startup: function () {
 
-		},
+            // postCreate
+            console.log('ckeditorformendix - startup');
 
-		/**
-		 * What to do when data is loaded?
-		 */
-		update: function (obj, callback) {
+        },
 
-			// startup
-			console.debug('ckeditorformendix - update');
+        /**
+         * What to do when data is loaded?
+         */
+        update: function (obj, callback) {
 
-			this._contextObj = obj;
-			this._resetSubscriptions();
-			this._updateRendering();
-			
-			callback();
-			
-		},
+            // startup
+            console.debug('ckeditorformendix - update');
 
-		enable: function () {
-			//TODO, what will happen if the widget is suspended (not visible).
-		},
+            this._contextObj = obj;
+            this._resetSubscriptions();
+            this._updateRendering();
 
-		disable: function () {
-			//TODO, what will happen if the widget is resumed (set visible).
-		},
+            callback();
 
-		uninitialize: function () {
+        },
 
-		},
+        enable: function () {
+            //TODO, what will happen if the widget is suspended (not visible).
+        },
 
-		/**
-		 * Extra setup widget methods.
-		 * ======================
-		 */
-		_setupWidget: function () {
+        disable: function () {
+            //TODO, what will happen if the widget is resumed (set visible).
+        },
 
-			// To be able to just alter one variable in the future we set an internal variable with the domNode that this widget uses.
-			this._wgtNode = this.domNode;
-		},
+        uninitialize: function () {
 
-		_setupEvents: function () {
-			// Handle change event of content!
-			this._editor.on('change', lang.hitch(this, function () {
-				this._editorChange(this._editor.getData());
-				
-				if(this.onChangeMicroflow) {
-					mx.data.action({
-						params: {
-							applyto: 'selection',
-							actionname: this.onChangeMicroflow,
-							guids: [this._contextObj.getGuid()]
-						},
-						callback: function (obj) {
-							//TODO what to do when all is ok!
-						},
-						error: function (error) {
-							console.log(this.id + ': An error occurred while executing microflow: ' + error.description);
-						}
-					}, this);
-				}
-			}));
-		},
-		
-		_editorChange: function (data) {
-			console.debug('ckeditorformendix - content has changed. - ' + data);
-			if (this._contextObj !== null) {
-				this._contextObj.set(this.messageString, data);
-			}
-		},
+        },
 
-		// Create child nodes.
-		_createChildNodes: function () {
+        /**
+         * Extra setup widget methods.
+         * ======================
+         */
+        _setupWidget: function () {
 
-			// Example setting message
-			this.domNode.appendChild(mxui.dom.create('textarea', {
-				'name': 'html_editor_' + this.id,
-				'id': 'html_editor_' + this.id,
-				'rows': '10',
-				'cols': '80'
-			}));
+            // To be able to just alter one variable in the future we set an internal variable with the domNode that this widget uses.
+            this._wgtNode = this.domNode;
+        },
 
-				var editor = null,
-					seperator1 = null,
-					seperator2 = null;
+        _setupEvents: function () {
+            // On key press event
+            this._editor.on('change', lang.hitch(this, function () {
+                this._editorChange(this._editor.getData());
 
-				console.debug('ckeditorformendix - BASEPATH - ' + window.CKEDITOR_BASEPATH);
+                if (this.onKeyPressMicroflow) {
+                    mx.data.action({
+                        params: {
+                            applyto: 'selection',
+                            actionname: this.onKeyPressMicroflow,
+                            guids: [this._contextObj.getGuid()]
+                        },
+                        callback: function (obj) {
+                            //TODO what to do when all is ok!
+                        },
+                        error: function (error) {
+                            console.log(this.id + ': An error occurred while executing microflow: ' + error.description);
+                        }
+                    }, this);
+                }
+            }));
 
-				// Create new config!
-				this._settings = [];
-				this._settings[this.id] = {
-					config: {
-						toolbarGroups: []
-					}
-				};
+            //On change event
+            this._editor.on('blur', lang.hitch(this, function (e) {
+                if (this._editor.checkDirty() && this.onChangeMicroflow) {
+                    mx.data.action({
+                        params: {
+                            applyto: 'selection',
+                            actionname: this.onChangeMicroflow,
+                            guids: [this._contextObj.getGuid()]
+                        },
+                        callback: lang.hitch(this, function (obj) {
+                            //TODO what to do when all is ok!
+                            this._editor.resetDirty();
+                        }),
+                        error: lang.hitch(this, function (error) {
+                            console.log(this.id + ': An error occurred while executing microflow: ' + error.description);
+                        })
+                    }, this);
+                }
 
-				this._CKEditor = window.CKEDITOR;
+            }));
+        },
 
-				// Collapsable toolbar
-				this._settings[this.id].config.toolbarCanCollapse = true;
+        _editorChange: function (data) {
+            console.debug('ckeditorformendix - content has changed. - ' + data);
+            if (this._contextObj !== null) {
+                this._contextObj.set(this.messageString, data);
+            }
+        },
 
-				// Autogrow functionality of the editor.
-				this._settings[this.id].config.autoGrow_minHeight = 300;
-				this._settings[this.id].config.autoGrow_onStartup = true;
-				if(this.width > 0) { 
-					this._settings[this.id].config.width = this.width;
-				}
-				if(this.height > 0) { 
-					this._settings[this.id].config.height = this.height;
-				}
-				
+        // Create child nodes.
+        _createChildNodes: function () {
 
-				// Base URL inside CKEditor
-				this._settings[this.id].config.baseHref = mx.appUrl;
+            // Example setting message
+            this.domNode.appendChild(mxui.dom.create('textarea', {
+                'name': 'html_editor_' + this.id,
+                'id': 'html_editor_' + this.id,
+                'rows': '10',
+                'cols': '80'
+            }));
 
-				// CSS class
-				if (this.bodyCssClass !== '') {
-					this._settings[this.id].config.bodyClass = this.bodyCssClass;
-				}
+            var editor = null,
+                seperator1 = null,
+                seperator2 = null;
 
-				seperator1 = false;
-				seperator2 = false;
+            console.debug('ckeditorformendix - BASEPATH - ' + window.CKEDITOR_BASEPATH);
 
-				this._CKEditor.config.toolbarGroups = [];
+            // Create new config!
+            this._settings = [];
+            this._settings[this.id] = {
+                config: {
+                    toolbarGroups: []
+                }
+            };
 
-				if (this.toolbarDocument) {
-					this._settings[this.id].config.toolbarGroups.push({
-						name: 'document',
-						groups: ['mode', 'document', 'doctools']
-					});
-					seperator1 = true;
-				}
-				if (this.toolbarClipboard) {
-					this._settings[this.id].config.toolbarGroups.push({
-						name: 'clipboard',
-						groups: ['clipboard', 'undo']
-					});
-					seperator1 = true;
-				}
-				if (this.toolbarEditing) {
-					this._settings[this.id].config.toolbarGroups.push({
-						name: 'editing',
-						groups: ['find', 'selection', 'spellchecker']
-					});
-					seperator1 = true;
-				}
-				if (this.toolbarForms) {
-					this._settings[this.id].config.toolbarGroups.push({
-						name: 'forms'
-					});
-					seperator1 = true;
-				}
+            this._CKEditor = window.CKEDITOR;
 
-				if (this.toolbarSeperator1) {
-					this._settings[this.id].config.toolbarGroups.push('/');
-				}
+            // Collapsable toolbar
+            this._settings[this.id].config.toolbarCanCollapse = true;
 
-				if (this.toolbarBasicstyles) {
-					this._settings[this.id].config.toolbarGroups.push({
-						name: 'basicstyles',
-						groups: ['basicstyles', 'cleanup']
-					});
-					seperator2 = true;
-				}
-				if (this.toolbarParagraph) {
-					this._settings[this.id].config.toolbarGroups.push({
-						name: 'paragraph',
-						groups: ['list', 'indent', 'blocks', 'align', 'bidi']
-					});
-					seperator2 = true;
-				}
-				if (this.toolbarLinks) {
-					this._settings[this.id].config.toolbarGroups.push({
-						name: 'links'
-					});
-					seperator2 = true;
-				}
-				if (this.toolbarInsert) {
-					this._settings[this.id].config.toolbarGroups.push({
-						name: 'insert'
-					});
-					seperator2 = true;
-				}
+            // Autogrow functionality of the editor.
+            this._settings[this.id].config.autoGrow_minHeight = 300;
+            this._settings[this.id].config.autoGrow_onStartup = true;
+            if (this.width > 0) {
+                this._settings[this.id].config.width = this.width;
+            }
+            if (this.height > 0) {
+                this._settings[this.id].config.height = this.height;
+            }
 
-				if (this.toolbarSeperator2) {
-					this._settings[this.id].config.toolbarGroups.push('/');
-				}
 
-				if (this.toolbarStyles) {
-					this._settings[this.id].config.toolbarGroups.push({
-						name: 'styles'
-					});
-				}
-				if (this.toolbarColors) {
-					this._settings[this.id].config.toolbarGroups.push({
-						name: 'colors'
-					});
-				}
-				if (this.toolbarTools) {
-					this._settings[this.id].config.toolbarGroups.push({
-						name: 'tools'
-					});
-				}
-				if (this.toolbarOthers) {
-					this._settings[this.id].config.toolbarGroups.push({
-						name: 'others'
-					});
-				}
+            // Base URL inside CKEditor
+            this._settings[this.id].config.baseHref = mx.appUrl;
 
-				// Create a CKEditor from HTML element.
-				this._editor = this._CKEditor.replace('html_editor_' + this.id, this._settings[this.id].config);
+            // CSS class
+            if (this.bodyCssClass !== '') {
+                this._settings[this.id].config.bodyClass = this.bodyCssClass;
+            }
 
-				// Attach Mendix Widget to editor and pass to the CKEditor the mendix widget configuration.
-				this._editor.mendixWidget = this;
-				this._editor.mendixWidgetID = this.id;
-				this._editor.mendixWidgetConfig = {
-					microflowLinks: this.microflowLinks
-				};
+            seperator1 = false;
+            seperator2 = false;
 
-				// in case of data not loaded into editor, because editor was not ready
-				lang.hitch(this, this._updateRendering());
+            this._CKEditor.config.toolbarGroups = [];
 
-				console.debug('ckeditorformendix - createChildNodes events');
-				console.debug('ckeditorformendix - added');
+            if (this.toolbarDocument) {
+                this._settings[this.id].config.toolbarGroups.push({
+                    name: 'document',
+                    groups: ['mode', 'document', 'doctools']
+                });
+                seperator1 = true;
+            }
+            if (this.toolbarClipboard) {
+                this._settings[this.id].config.toolbarGroups.push({
+                    name: 'clipboard',
+                    groups: ['clipboard', 'undo']
+                });
+                seperator1 = true;
+            }
+            if (this.toolbarEditing) {
+                this._settings[this.id].config.toolbarGroups.push({
+                    name: 'editing',
+                    groups: ['find', 'selection', 'spellchecker']
+                });
+                seperator1 = true;
+            }
+            if (this.toolbarForms) {
+                this._settings[this.id].config.toolbarGroups.push({
+                    name: 'forms'
+                });
+                seperator1 = true;
+            }
 
-		},
+            if (this.toolbarSeperator1) {
+                this._settings[this.id].config.toolbarGroups.push('/');
+            }
 
-		_handleValidation: function(validations) {
-			this._clearValidations();
+            if (this.toolbarBasicstyles) {
+                this._settings[this.id].config.toolbarGroups.push({
+                    name: 'basicstyles',
+                    groups: ['basicstyles', 'cleanup']
+                });
+                seperator2 = true;
+            }
+            if (this.toolbarParagraph) {
+                this._settings[this.id].config.toolbarGroups.push({
+                    name: 'paragraph',
+                    groups: ['list', 'indent', 'blocks', 'align', 'bidi']
+                });
+                seperator2 = true;
+            }
+            if (this.toolbarLinks) {
+                this._settings[this.id].config.toolbarGroups.push({
+                    name: 'links'
+                });
+                seperator2 = true;
+            }
+            if (this.toolbarInsert) {
+                this._settings[this.id].config.toolbarGroups.push({
+                    name: 'insert'
+                });
+                seperator2 = true;
+            }
 
-			var val = validations[0],
-				msg = val.getReasonByAttribute(this.messageString);    
+            if (this.toolbarSeperator2) {
+                this._settings[this.id].config.toolbarGroups.push('/');
+            }
 
-			if(this.readOnly){
-				val.removeAttribute(this.messageString);
-			} else {                                
-				if (msg) {
-					this._addValidation(msg);
-					val.removeAttribute(this.messageString);
-				}
-			}
-		},
+            if (this.toolbarStyles) {
+                this._settings[this.id].config.toolbarGroups.push({
+                    name: 'styles'
+                });
+            }
+            if (this.toolbarColors) {
+                this._settings[this.id].config.toolbarGroups.push({
+                    name: 'colors'
+                });
+            }
+            if (this.toolbarTools) {
+                this._settings[this.id].config.toolbarGroups.push({
+                    name: 'tools'
+                });
+            }
+            if (this.toolbarOthers) {
+                this._settings[this.id].config.toolbarGroups.push({
+                    name: 'others'
+                });
+            }
 
-		_clearValidations: function() {
-			domConstruct.destroy(this._alertdiv);
-		},
+            // Create a CKEditor from HTML element.
+            this._editor = this._CKEditor.replace('html_editor_' + this.id, this._settings[this.id].config);
 
-		_addValidation : function(msg) {
-			this._alertdiv = domConstruct.create("div", { 
-				class : 'alert alert-danger',
-				innerHTML: msg });
+            // Attach Mendix Widget to editor and pass to the CKEditor the mendix widget configuration.
+            this._editor.mendixWidget = this;
+            this._editor.mendixWidgetID = this.id;
+            this._editor.mendixWidgetConfig = {
+                microflowLinks: this.microflowLinks
+            };
 
-			this.domNode.appendChild(this._alertdiv);
 
-		},
-		
-		/**
-		 * Interaction widget methods.
-		 * ======================
-		 */
-		_updateRendering: function () {
+            // in case of data not loaded into editor, because editor was not ready
+            lang.hitch(this, this._updateRendering());
 
-			if(this._contextObj) {			
-				console.debug(this._contextObj.get(this.messageString));
+            console.debug('ckeditorformendix - createChildNodes events');
+            console.debug('ckeditorformendix - added');
 
-				domStyle.set(this.domNode, "visibility", "visible");
-				
-				if (this._editor !== null) {
-					this._editor.setData(this._contextObj.get(this.messageString));
-				} else {
-					console.info('ckeditorformendix - Unable to add contents to editor, no _editor object available');
-				}
-			}
-			else {
-				domStyle.set(this.domNode, "visibility", "hidden");
-			}
-		},
-		_resetSubscriptions: function () {
-			var objHandle = null, 
-				attrHandle = null, 
-				validationHandle = null;
+        },
 
-			// Release handles on previous object, if any.
-			if(this._handles){
-				this._handles.forEach(function (handle, i) {
-					mx.data.unsubscribe(handle);
-				});
-			}
+        _handleValidation: function (validations) {
+            this._clearValidations();
 
-			if (this._contextObj) {
-				objHandle = this.subscribe({
-					guid: this._contextObj.getGuid(),
-					callback: lang.hitch(this,function(guid) {
-						this._updateRendering();
-					})
-				});
-				
-//				attrHandle = this.subscribe({
-//					guid: this._contextObj.getGuid(),
-//					attr: this.messageString,
-//					callback: lang.hitch(this,function(guid,attr,attrValue) {
-//						this._updateRendering();
-//					})
-//				});
+            var val = validations[0],
+                msg = val.getReasonByAttribute(this.messageString);
 
-				validationHandle = mx.data.subscribe({
-					guid     : this._contextObj.getGuid(),
-					val      : true,
-					callback : lang.hitch(this,this._handleValidation)
-				});
+            if (this.readOnly) {
+                val.removeAttribute(this.messageString);
+            } else {
+                if (msg) {
+                    this._addValidation(msg);
+                    val.removeAttribute(this.messageString);
+                }
+            }
+        },
 
-				this._handles = [objHandle, attrHandle, validationHandle];
-			}
-		}
-	});
+        _clearValidations: function () {
+            domConstruct.destroy(this._alertdiv);
+        },
+
+        _addValidation: function (msg) {
+            this._alertdiv = domConstruct.create("div", {
+                class: 'alert alert-danger',
+                innerHTML: msg
+            });
+
+            this.domNode.appendChild(this._alertdiv);
+
+        },
+
+        /**
+         * Interaction widget methods.
+         * ======================
+         */
+        _updateRendering: function () {
+
+            if (this._contextObj) {
+                console.debug(this._contextObj.get(this.messageString));
+
+                domStyle.set(this.domNode, "visibility", "visible");
+
+                if (this._editor !== null) {
+                    this._editor.setData(this._contextObj.get(this.messageString));
+                } else {
+                    console.info('ckeditorformendix - Unable to add contents to editor, no _editor object available');
+                }
+            } else {
+                domStyle.set(this.domNode, "visibility", "hidden");
+            }
+        },
+        _resetSubscriptions: function () {
+            var objHandle = null,
+                attrHandle = null,
+                validationHandle = null;
+
+            // Release handles on previous object, if any.
+            if (this._handles) {
+                this._handles.forEach(function (handle, i) {
+                    mx.data.unsubscribe(handle);
+                });
+            }
+
+            if (this._contextObj) {
+                objHandle = this.subscribe({
+                    guid: this._contextObj.getGuid(),
+                    callback: lang.hitch(this, function (guid) {
+                        this._updateRendering();
+                    })
+                });
+
+                //				attrHandle = this.subscribe({
+                //					guid: this._contextObj.getGuid(),
+                //					attr: this.messageString,
+                //					callback: lang.hitch(this,function(guid,attr,attrValue) {
+                //						this._updateRendering();
+                //					})
+                //				});
+
+                validationHandle = mx.data.subscribe({
+                    guid: this._contextObj.getGuid(),
+                    val: true,
+                    callback: lang.hitch(this, this._handleValidation)
+                });
+
+                this._handles = [objHandle, attrHandle, validationHandle];
+            }
+        }
+    });
 });
-
-
-
