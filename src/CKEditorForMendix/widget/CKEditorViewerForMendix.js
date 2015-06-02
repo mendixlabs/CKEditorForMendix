@@ -87,7 +87,7 @@ require({
 
 			if(this._contextObj) {
 				
-				domStyle.set(this.domNode, "display", "initial");
+				domStyle.set(this.domNode, "display", "inline");
 				var html = this._contextObj.get(this.messageString),
 					name = Date.now();
 
