@@ -337,7 +337,8 @@ require({
         },
 		
         uninitialize: function () {
-			console.debug('Unitializing CKEditor.');
+			this._editor.removeAllListeners();
+			this._CKEditor.remove(this._editor);
         }
     });
 });
