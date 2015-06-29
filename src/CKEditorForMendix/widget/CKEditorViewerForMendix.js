@@ -2,7 +2,6 @@
 /*global mx, mxui, document, define, require, browser, devel, console, window, dojo */
 /*mendix */
 
-// Required module list. Remove unnecessary modules, you can always get them back from the boilerplate.
 require({
 	packages: [{
 		name: 'jquery',
@@ -15,74 +14,29 @@ require({
 	}]
 }, [
 	'dojo/_base/declare', 'mxui/widget/_WidgetBase', 'dijit/_TemplatedMixin',
-	'mxui/dom', 'dojo/dom', 'dojo/query', 'dojo/dom-prop', 'dojo/dom-geometry', 'dojo/dom-class', 'dojo/dom-style', 'dojo/dom-construct', 'dojo/_base/array', 'dojo/_base/lang', 'dojo/text',
+	'dojo/dom-style', 'dojo/_base/array', 'dojo/_base/lang', 'dojo/text',
 	'jquery', 'ckeditor', 'dojo/text!CKEditorForMendix/widget/templates/CKEditorViewerForMendix.html'
-], function (declare, _WidgetBase, _TemplatedMixin, dom, dojoDom, domQuery, domProp, domGeom, domClass, domStyle, domConstruct, dojoArray, lang, text, $, _CKEditorViewer, widgetTemplate) {
+], function (declare, _WidgetBase, _TemplatedMixin, domStyle, dojoArray, lang, text, $, _CKEditorViewer, widgetTemplate) {
 	'use strict';
 
-	// Declare widget.
 	return declare('CKEditorForMendix.widget.CKEditorViewerForMendix', [_WidgetBase, _TemplatedMixin], {
 
 		// Template path
 		templateString: widgetTemplate,
 		
-		/**
-		 * Internal variables.
-		 * ======================
-		 */
 		_contextObj: null,
 		_handles: null,
 
-
-		/**
-		 * Mendix Widget methods.
-		 * ======================
-		 */
-
-		// DOJO.WidgetBase -> PostCreate is fired after the properties of the widget are set.
-		postCreate: function () {
-
-			// postCreate
-			console.log('CKEditorViewerForMendixNode - postCreate');
-
-		},
-
-		/**
-		 * What to do when data is loaded?
-		 */
 		update: function (obj, callback) {
-
-			// startup
 			console.log('CKEditorViewerForMendixNode - update');
 			
 			this._contextObj = obj;
 			this._resetSubscriptions();
 			this._updateRendering();
 
-			// Execute callback.
 			callback();
 		},
 
-		/**
-		 * How the widget re-acts from actions invoked by the Mendix App.
-		 */
-
-		enable: function () {
-			//TODO, what will happen if the widget is suspended (not visible).
-		},
-
-		disable: function () {
-			//TODO, what will happen if the widget is resumed (set visible).
-		},
-
-		uninitialize: function () {
-			//TODO, clean up only events
-		},
-
-		/**
-		 * Interaction widget methods.
-		 * ======================
-		 */
 		_updateRendering: function () {
 
 			if(this._contextObj) {
@@ -115,7 +69,7 @@ require({
 
 			// Release handles on previous object, if any.
 			if(this._handles){
-				this._handles.forEach(function (handle, i) {
+				dojoArray.forEach(this._handles, function (handle) {
 					mx.data.unsubscribe(handle);
 				});
 			}
