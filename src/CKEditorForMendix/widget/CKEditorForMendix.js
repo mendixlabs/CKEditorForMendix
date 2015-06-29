@@ -2,7 +2,6 @@
 /*global mx, mxui, document, define, require, browser, devel, console, window */
 /*mendix */
 
-// Required module list. Remove unnecessary modules, you can always get them back from the boilerplate.
 require({
     packages: [{
         name: 'jquery',
@@ -15,23 +14,17 @@ require({
  }]
 }, [
  'dojo/_base/declare', 'mxui/widget/_WidgetBase', 'dijit/_TemplatedMixin',
- 'mxui/dom', 'dojo/dom', 'dojo/query', 'dojo/dom-prop', 'dojo/dom-geometry', 'dojo/dom-class', 'dojo/dom-style', 'dojo/dom-construct', 'dojo/_base/array', 'dojo/_base/lang', 'dojo/text',
+ 'mxui/dom', 'dojo/dom-style', 'dojo/dom-construct', 'dojo/_base/array', 'dojo/_base/lang', 'dojo/text',
  'jquery', 'ckeditor', 'dojo/text!CKEditorForMendix/widget/templates/CKEditorForMendix.html'
-], function (declare, _WidgetBase, _TemplatedMixin, dom, dojoDom, domQuery, domProp, domGeom, domClass, domStyle, domConstruct, dojoArray, lang, text, $, _CKEditor, widgetTemplate) {
+], function (declare, _WidgetBase, _TemplatedMixin, dom, domStyle, domConstruct, dojoArray, lang, text, $, _CKEditor, widgetTemplate) {
     'use strict';
 
-    // Declare widget.
     return declare('CKEditorForMendix.widget.CKEditorForMendix', [_WidgetBase, _TemplatedMixin], {
-
-        /**
-         * Internal variables.
-         * ======================
-         */
-        _wgtNode: null,
         _contextGuid: null,
         _contextObj: null,
         _handles: null,
         _alertdiv: null,
+		_hasStarted : false,
 
         // Extra variables
         _extraContentDiv: null,
@@ -40,49 +33,24 @@ require({
         // CKEditor instances.
         _settings: null,
 
-        // Template path
         templateString: widgetTemplate,
 
-        /**
-         * Mendix Widget methods.
-         * ======================
-         */
-
-
-        //this._editor.checkDirty();
-        // DOJO.WidgetBase -> PostCreate is fired after the properties of the widget are set.
-        postCreate: function () {
-
-            // postCreate
-            console.debug('ckeditorformendix - postCreate');
-
-            // Load CSS ... automaticly from ui directory
-
-            // Setup widgets
-            this._setupWidget();
-
+        startup: function () {
+			if (this._hasStarted)
+				return;
+				
+			this._hasStarted = true;
+			
+            console.debug('ckeditorformendix - startup');
+			
             // Create childnodes
             if (!this.readOnly) {
                 this._createChildNodes();
                 this._setupEvents();
             }
-
         },
 
-        // DOJO.WidgetBase -> Startup is fired after the properties of the widget are set.
-        startup: function () {
-
-            // postCreate
-            console.log('ckeditorformendix - startup');
-
-        },
-
-        /**
-         * What to do when data is loaded?
-         */
         update: function (obj, callback) {
-
-            // startup
             console.debug('ckeditorformendix - update');
 
             this._contextObj = obj;
@@ -90,30 +58,8 @@ require({
             this._updateRendering();
 
             callback();
-
         },
 
-        enable: function () {
-            //TODO, what will happen if the widget is suspended (not visible).
-        },
-
-        disable: function () {
-            //TODO, what will happen if the widget is resumed (set visible).
-        },
-
-        uninitialize: function () {
-
-        },
-
-        /**
-         * Extra setup widget methods.
-         * ======================
-         */
-        _setupWidget: function () {
-
-            // To be able to just alter one variable in the future we set an internal variable with the domNode that this widget uses.
-            this._wgtNode = this.domNode;
-        },
 
         _setupEvents: function () {
             // On key press event
@@ -128,7 +74,6 @@ require({
                             guids: [this._contextObj.getGuid()]
                         },
                         callback: function (obj) {
-                            //TODO what to do when all is ok!
                         },
                         error: function (error) {
                             console.log(this.id + ': An error occurred while executing microflow: ' + error.description);
@@ -147,7 +92,6 @@ require({
                             guids: [this._contextObj.getGuid()]
                         },
                         callback: lang.hitch(this, function (obj) {
-                            //TODO what to do when all is ok!
                             this._editor.resetDirty();
                         }),
                         error: lang.hitch(this, function (error) {
@@ -168,22 +112,19 @@ require({
 
         // Create child nodes.
         _createChildNodes: function () {
-
-            // Example setting message
-            this.domNode.appendChild(mxui.dom.create('textarea', {
+            this.domNode.appendChild(dom.create('textarea', {
                 'name': 'html_editor_' + this.id,
                 'id': 'html_editor_' + this.id,
                 'rows': '10',
                 'cols': '80'
             }));
 
-            var editor = null,
-                seperator1 = null,
+            var seperator1 = null,
                 seperator2 = null;
 
             console.debug('ckeditorformendix - BASEPATH - ' + window.CKEDITOR_BASEPATH);
 
-            // Create new config!
+            // Create new config
             this._settings = [];
             this._settings[this.id] = {
                 config: {
@@ -307,20 +248,17 @@ require({
             // Create a CKEditor from HTML element.
             this._editor = this._CKEditor.replace('html_editor_' + this.id, this._settings[this.id].config);
 
-            // Attach Mendix Widget to editor and pass to the CKEditor the mendix widget configuration.
+            // Attach Mendix Widget to editor and pass the mendix widget configuration to the CKEditor.
             this._editor.mendixWidget = this;
             this._editor.mendixWidgetID = this.id;
             this._editor.mendixWidgetConfig = {
                 microflowLinks: this.microflowLinks
             };
 
-
             // in case of data not loaded into editor, because editor was not ready
-            lang.hitch(this, this._updateRendering());
+            this._updateRendering();
 
             console.debug('ckeditorformendix - createChildNodes events');
-            console.debug('ckeditorformendix - added');
-
         },
 
         _handleValidation: function (validations) {
@@ -352,13 +290,8 @@ require({
             this.domNode.appendChild(this._alertdiv);
 
         },
-
-        /**
-         * Interaction widget methods.
-         * ======================
-         */
+		
         _updateRendering: function () {
-
             if (this._contextObj) {
                 console.debug(this._contextObj.get(this.messageString));
 
@@ -373,14 +306,14 @@ require({
                 domStyle.set(this.domNode, "visibility", "hidden");
             }
         },
+		
         _resetSubscriptions: function () {
             var objHandle = null,
-                attrHandle = null,
                 validationHandle = null;
 
             // Release handles on previous object, if any.
             if (this._handles) {
-                this._handles.forEach(function (handle, i) {
+				dojoArray.forEach(this._handles, function (handle) {
                     mx.data.unsubscribe(handle);
                 });
             }
@@ -393,22 +326,18 @@ require({
                     })
                 });
 
-                //				attrHandle = this.subscribe({
-                //					guid: this._contextObj.getGuid(),
-                //					attr: this.messageString,
-                //					callback: lang.hitch(this,function(guid,attr,attrValue) {
-                //						this._updateRendering();
-                //					})
-                //				});
-
                 validationHandle = mx.data.subscribe({
                     guid: this._contextObj.getGuid(),
                     val: true,
                     callback: lang.hitch(this, this._handleValidation)
                 });
 
-                this._handles = [objHandle, attrHandle, validationHandle];
+                this._handles = [objHandle, validationHandle];
             }
+        },
+		
+        uninitialize: function () {
+			console.debug('Unitializing CKEditor.');
         }
     });
 });
