@@ -43,7 +43,7 @@ require({
 				
 				domStyle.set(this.domNode, "display", "inline");
 				var html = this._contextObj.get(this.messageString),
-					name = Date.now();
+					name = Date.now ? Date.now() : +new Date;
 
 				// Set the content of the link.
 				window.CKEditorViewer.data[this.id] = {};
