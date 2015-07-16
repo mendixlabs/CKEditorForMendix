@@ -337,8 +337,10 @@ require({
         },
 		
         uninitialize: function () {
-			this._editor.removeAllListeners();
-			this._CKEditor.remove(this._editor);
+			if (this._editor) {
+				this._editor.removeAllListeners();
+				this._CKEditor.remove(this._editor);
+			}
         }
     });
 });

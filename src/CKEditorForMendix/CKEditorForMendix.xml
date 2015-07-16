@@ -27,73 +27,73 @@
             <returnType type="Void" />
         </property>
         <property key="toolbarDocument" type="boolean" required="true" defaultValue="true">
-            <caption>Document toolbar</caption>
-            <category>Behavior</category>
+            <caption>Toolbar</caption>
+            <category>Document</category>
             <description>Show the document toolbar with toolbar 'mode', 'doctools', 'doctools'.</description>
         </property>
         <property key="toolbarClipboard" type="boolean" required="true" defaultValue="true">
-            <caption>Document clipboard</caption>
-            <category>Behavior</category>
+            <caption>Clipboard</caption>
+            <category>Document</category>
             <description>Show the clipboard toolbar with toolbar 'clipboard', 'undo'.</description>
         </property>
         <property key="toolbarEditing" type="boolean" required="true" defaultValue="true">
-            <caption>Document editing</caption>
-            <category>Behavior</category>
+            <caption>Editing</caption>
+            <category>Document</category>
             <description>Show the editing toolbar with toolbar 'find', 'selection', 'spellchecker'.</description>
         </property>
         <property key="toolbarForms" type="boolean" required="true" defaultValue="true">
-            <caption>Document forms</caption>
-            <category>Behavior</category>
+            <caption>Forms</caption>
+            <category>Document</category>
             <description>Show the forms toolbar.</description>
         </property>
         <property key="toolbarSeperator1" type="boolean" required="true" defaultValue="true">
-            <caption>Document seperator 1</caption>
-            <category>Behavior</category>
+            <caption>Seperator 1</caption>
+            <category>Document</category>
             <description>Show the seperator one.</description>
         </property>
         <property key="toolbarBasicstyles" type="boolean" required="true" defaultValue="true">
-            <caption>Document basicstyles</caption>
-            <category>Behavior</category>
+            <caption>Basicstyles</caption>
+            <category>Document</category>
             <description>Show the basicstyles toolbar with toolbar 'basicstyles', 'cleanup'.</description>
         </property>
         <property key="toolbarParagraph" type="boolean" required="true" defaultValue="true">
-            <caption>Document paragraph</caption>
-            <category>Behavior</category>
+            <caption>Paragraph</caption>
+            <category>Document</category>
             <description>Show the paragraph toolbar with toolbar 'list', 'indent', 'blocks', 'align', 'bidi'.</description>
         </property>
         <property key="toolbarLinks" type="boolean" required="true" defaultValue="true">
-            <caption>Document links</caption>
-            <category>Behavior</category>
+            <caption>Links</caption>
+            <category>Document</category>
             <description>Show the links toolbar.</description>
         </property>
         <property key="toolbarInsert" type="boolean" required="true" defaultValue="true">
-            <caption>Document insert</caption>
-            <category>Behavior</category>
+            <caption>Insert</caption>
+            <category>Document</category>
             <description>Show the insert toolbar.</description>
         </property>
         <property key="toolbarSeperator2" type="boolean" required="true" defaultValue="true">
-            <caption>Document seperator 2</caption>
-            <category>Behavior</category>
+            <caption>Seperator 2</caption>
+            <category>Document</category>
             <description>Show the seperator two.</description>
         </property>
         <property key="toolbarStyles" type="boolean" required="true" defaultValue="true">
-            <caption>Document styles</caption>
-            <category>Behavior</category>
+            <caption>Styles</caption>
+            <category>Document</category>
             <description>Show the styles toolbar.</description>
         </property>
         <property key="toolbarColors" type="boolean" required="true" defaultValue="true">
-            <caption>Document colors</caption>
-            <category>Behavior</category>
+            <caption>Colors</caption>
+            <category>Document</category>
             <description>Show the colors toolbar.</description>
         </property>
         <property key="toolbarTools" type="boolean" required="true" defaultValue="true">
-            <caption>Document tools</caption>
-            <category>Behavior</category>
+            <caption>Tools</caption>
+            <category>Document</category>
             <description>Show the tools toolbar.</description>
         </property>
         <property key="toolbarOthers" type="boolean" required="true" defaultValue="true">
-            <caption>Document others</caption>
-            <category>Behavior</category>
+            <caption>Others</caption>
+            <category>Document</category>
             <description>Show the others toolbar.</description>
         </property>
         <property key="bodyCssClass" type="string" required="false">
