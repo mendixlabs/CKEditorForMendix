@@ -283,7 +283,7 @@ require({
 
         _addValidation: function (msg) {
             this._alertdiv = domConstruct.create("div", {
-                class: 'alert alert-danger',
+                'class': 'alert alert-danger',
                 innerHTML: msg
             });
 
