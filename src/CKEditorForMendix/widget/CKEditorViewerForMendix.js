@@ -2,25 +2,17 @@
 /*global mx, mxui, document, define, require, browser, devel, console, window, dojo */
 /*mendix */
 
-require({
-	packages: [{
-		name: 'jquery',
-		location: '../../widgets/CKEditorForMendix/widget/lib',
-		main: 'jquery'
-	}, {
-		name: 'ckeditor',
-		location: '../../widgets/CKEditorForMendix/widget/lib',
-		main: 'ckeditor_viewer'
-	}]
-}, [
+define([
 	'dojo/_base/declare', 'mxui/widget/_WidgetBase', 'dijit/_TemplatedMixin',
 	'dojo/dom-style', 'dojo/_base/array', 'dojo/_base/lang', 'dojo/text',
-	'jquery', 'ckeditor', 'dojo/text!CKEditorForMendix/widget/templates/CKEditorViewerForMendix.html'
-], function (declare, _WidgetBase, _TemplatedMixin, domStyle, dojoArray, lang, text, $, _CKEditorViewer, widgetTemplate) {
+	'CKEditorForMendix/widget/lib/jquery-1.11.1', 'CKEditorForMendix/widget/lib/ckeditor_viewer', 'dojo/text!CKEditorForMendix/widget/templates/CKEditorViewerForMendix.html'
+], function (declare, _WidgetBase, _TemplatedMixin, domStyle, dojoArray, lang, text, _jQuery, _CKEditorViewer, widgetTemplate) {
 	'use strict';
 
+	var $ = _jQuery.noConflict(true);
+	
 	return declare('CKEditorForMendix.widget.CKEditorViewerForMendix', [_WidgetBase, _TemplatedMixin], {
-
+		
 		// Template path
 		templateString: widgetTemplate,
 		
