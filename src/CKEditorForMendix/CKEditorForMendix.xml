@@ -26,6 +26,16 @@
             <description>Microflow which is triggered when the content is changed on blur</description>
             <returnType type="Void" />
         </property>
+        <property key="enterMode" type="enumeration" defaultValue="P">
+            <caption>Entermode</caption>
+            <category>Behavior</category>
+            <description>Set the behavior of the Enter key</description>
+            <enumerationValues>
+                <enumerationValue key="P">Paragraphs (P)</enumerationValue>
+                <enumerationValue key="BR">Brake lines (BR)</enumerationValue>
+                <enumerationValue key="DIV">Blocks (DIV)</enumerationValue>
+            </enumerationValues>
+        </property>
         <property key="toolbarDocument" type="boolean" required="true" defaultValue="true">
             <caption>Toolbar</caption>
             <category>Document</category>

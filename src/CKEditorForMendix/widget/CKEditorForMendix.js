@@ -3,20 +3,29 @@
 /*mendix */
 
 define([
- 'dojo/_base/declare', 'mxui/widget/_WidgetBase', 'dijit/_TemplatedMixin',
- 'mxui/dom', 'dojo/dom-style', 'dojo/dom-construct', 'dojo/_base/array', 'dojo/_base/lang', 'dojo/text',
- 'CKEditorForMendix/widget/lib/jquery-1.11.1', 'CKEditorForMendix/widget/lib/ckeditor', 'dojo/text!CKEditorForMendix/widget/templates/CKEditorForMendix.html'
-], function (declare, _WidgetBase, _TemplatedMixin, dom, domStyle, domConstruct, dojoArray, lang, text, _jQuery, _CKEditor, widgetTemplate) {
+        'dojo/_base/declare',
+        'mxui/widget/_WidgetBase',
+        'dijit/_TemplatedMixin',
+        'mxui/dom',
+        'dojo/dom-style',
+        'dojo/dom-construct',
+        'dojo/_base/array',
+        'dojo/_base/lang',
+        'dojo/text',
+        'CKEditorForMendix/widget/lib/jquery-1.11.1',
+        'CKEditorForMendix/widget/lib/ckeditor',
+        'dojo/text!CKEditorForMendix/widget/templates/CKEditorForMendix.html'
+    ], function (declare, _WidgetBase, _TemplatedMixin, dom, domStyle, domConstruct, dojoArray, lang, text, _jQuery, _CKEditor, widgetTemplate) {
     'use strict';
 
-	var $ = _jQuery.noConflict(true);
-	
+    var $ = _jQuery.noConflict(true);
+    
     return declare('CKEditorForMendix.widget.CKEditorForMendix', [_WidgetBase, _TemplatedMixin], {
         _contextGuid: null,
         _contextObj: null,
         _handles: null,
         _alertdiv: null,
-		_hasStarted : false,
+        _hasStarted : false,
 
         // Extra variables
         _extraContentDiv: null,
@@ -28,13 +37,13 @@ define([
         templateString: widgetTemplate,
 
         startup: function () {
-			if (this._hasStarted)
-				return;
-				
-			this._hasStarted = true;
-			
+            if (this._hasStarted)
+                return;
+                
+            this._hasStarted = true;
+            
             console.debug('ckeditorformendix - startup');
-			
+            
             // Create childnodes
             if (!this.readOnly) {
                 this._createChildNodes();
@@ -54,6 +63,8 @@ define([
 
 
         _setupEvents: function () {
+            
+            console.log(this);
             
             //On keypress event
             this._editor.on('key', lang.hitch(this, function () {
@@ -240,6 +251,9 @@ define([
 
             // Create a CKEditor from HTML element.
             this._editor = this._CKEditor.replace('html_editor_' + this.id, this._settings[this.id].config);
+            
+            // Set enterMode
+            this._editor.config.enterMode = this._CKEditor['ENTER_' + this.enterMode];
 
             // Attach Mendix Widget to editor and pass the mendix widget configuration to the CKEditor.
             this._editor.mendixWidget = this;
@@ -283,7 +297,7 @@ define([
             this.domNode.appendChild(this._alertdiv);
 
         },
-		
+        
         _updateRendering: function () {
             if (this._contextObj) {
                 console.debug(this._contextObj.get(this.messageString));
@@ -299,14 +313,14 @@ define([
                 domStyle.set(this.domNode, "visibility", "hidden");
             }
         },
-		
+        
         _resetSubscriptions: function () {
             var objHandle = null,
                 validationHandle = null;
 
             // Release handles on previous object, if any.
             if (this._handles) {
-				dojoArray.forEach(this._handles, function (handle) {
+                dojoArray.forEach(this._handles, function (handle) {
                     mx.data.unsubscribe(handle);
                 });
             }
@@ -328,12 +342,12 @@ define([
                 this._handles = [objHandle, validationHandle];
             }
         },
-		
+        
         uninitialize: function () {
-			if (this._editor) {
-				this._editor.removeAllListeners();
-				this._CKEditor.remove(this._editor);
-			}
+            if (this._editor) {
+                this._editor.removeAllListeners();
+                this._CKEditor.remove(this._editor);
+            }
         }
     });
 });
