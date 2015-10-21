@@ -23,7 +23,7 @@ CKEDITOR.plugins.add( 'mendixlink', {
             });
 
             editor.contextMenu.addListener( function( element ) {
-                if ( element.getAscendant( 'div', true ) && element.getAttribute('class').indexOf('mx-microflow-link') !== -1 ) {
+                if ( element.getAscendant( 'div', true ) && element.getAttribute('class') && element.getAttribute('class').indexOf('mx-microflow-link') !== -1 ) {
                     return { mendixlinkItem: CKEDITOR.TRISTATE_OFF };
                 }
             });
