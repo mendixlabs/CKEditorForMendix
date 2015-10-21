@@ -55,7 +55,7 @@ define([
 
         _setupEvents: function () {
             // On key press event
-            this._editor.on('change', lang.hitch(this, function () {
+            this._editor.on('key', lang.hitch(this, function () {
                 this._editorChange(this._editor.getData());
 
                 if (this.onKeyPressMicroflow) {
