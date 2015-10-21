@@ -1,5 +1,5 @@
 ﻿/**
- * @license Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+ * @license Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
@@ -13,10 +13,10 @@
  * (1) http://ckeditor.com/builder
  *     Visit online builder to build CKEditor from scratch.
  *
- * (2) http://ckeditor.com/builder/e6b8a045f8f984a69463975ca3e6524a
+ * (2) http://ckeditor.com/builder/e28e1c17acaeb42364c092d2fe181fc5
  *     Visit online builder to build CKEditor, starting with the same setup as before.
  *
- * (3) http://ckeditor.com/builder/download/e6b8a045f8f984a69463975ca3e6524a
+ * (3) http://ckeditor.com/builder/download/e28e1c17acaeb42364c092d2fe181fc5
  *     Straight download link to the latest version of CKEditor (Optimized) with the same setup as before.
  *
  * NOTE:
@@ -34,14 +34,15 @@ var CKBUILDER_CONFIG = {
 		'bender-out.log',
 		'dev',
 		'.DS_Store',
+		'.editorconfig',
 		'.gitattributes',
 		'.gitignore',
-		'Gruntfile.js',
 		'gruntfile.js',
 		'.idea',
 		'.jscsrc',
 		'.jshintignore',
 		'.jshintrc',
+		'less',
 		'.mailmap',
 		'node_modules',
 		'package.json',
@@ -60,6 +61,7 @@ var CKBUILDER_CONFIG = {
 		'contextmenu' : 1,
 		'dialogadvtab' : 1,
 		'div' : 1,
+		'divarea' : 1,
 		'elementspath' : 1,
 		'enterkey' : 1,
 		'entities' : 1,
