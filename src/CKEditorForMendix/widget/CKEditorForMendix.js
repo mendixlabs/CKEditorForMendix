@@ -63,8 +63,7 @@ define([
 
 
         _setupEvents: function () {
-            
-            //On keypress event
+            // On key press event
             this._editor.on('key', lang.hitch(this, function () {
                 this._editorChange(this._editor.getData());
 
