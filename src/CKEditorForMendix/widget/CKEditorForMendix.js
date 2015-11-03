@@ -251,6 +251,10 @@ define([
             
             // Set enterMode
             this._editor.config.enterMode = this._CKEditor['ENTER_' + this.enterMode];
+            this._editor.config.shiftEnterMode = this._CKEditor['ENTER_' + this.shiftEnterMode];
+
+            // Set autoparagraph
+            this._editor.config.autoParagraph  = this.autoParagraph;
 
             // Attach Mendix Widget to editor and pass the mendix widget configuration to the CKEditor.
             this._editor.mendixWidget = this;
