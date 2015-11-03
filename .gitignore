@@ -7,3 +7,7 @@ test/.project
 *.lock
 test/zip Progress Bar.bat
 .idea/
+
+*DS_Store*
+node_modules/
+dist/
