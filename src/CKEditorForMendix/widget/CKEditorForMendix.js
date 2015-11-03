@@ -43,7 +43,7 @@ define([
                 
             this._hasStarted = true;
             
-            console.debug('ckeditorformendix - startup');
+            //console.debug('ckeditorformendix - startup');
             
             // Create childnodes
             if (!this.readOnly) {
@@ -66,7 +66,7 @@ define([
         },
 
         update: function (obj, callback) {
-            console.debug('ckeditorformendix - update');
+            //console.debug('ckeditorformendix - update');
 
             this._contextObj = obj;
             this._resetSubscriptions();
@@ -119,7 +119,7 @@ define([
         },
 
         _editorChange: function (data) {
-            console.debug('ckeditorformendix - content has changed. - ' + data);
+            //console.debug('ckeditorformendix - content has changed. - ' + data);
             if (this._contextObj !== null) {
                 this._contextObj.set(this.messageString, data);
             }
@@ -137,7 +137,7 @@ define([
             var seperator1 = null,
                 seperator2 = null;
 
-            console.debug('ckeditorformendix - BASEPATH - ' + window.CKEDITOR_BASEPATH);
+            //console.debug('ckeditorformendix - BASEPATH - ' + window.CKEDITOR_BASEPATH);
 
             // Create new config
             this._settings = [];
@@ -280,7 +280,7 @@ define([
             // in case of data not loaded into editor, because editor was not ready
             this._updateRendering();
 
-            console.debug('ckeditorformendix - createChildNodes events');
+            //console.debug('ckeditorformendix - createChildNodes events');
         },
 
         _handleValidation: function (validations) {
@@ -315,7 +315,7 @@ define([
         
         _updateRendering: function () {
             if (this._contextObj) {
-                console.debug(this._contextObj.get(this.messageString));
+                //console.debug(this._contextObj.get(this.messageString));
 
                 domStyle.set(this.domNode, "visibility", "visible");
 
