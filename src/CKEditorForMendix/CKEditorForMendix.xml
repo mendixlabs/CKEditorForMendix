@@ -148,6 +148,16 @@
                 </property>
             </properties>
         </property>
+    	<property key="showLabel" type="boolean" defaultValue="false">
+			<caption>Show Label</caption>
+			<category>Appearance</category>
+			<description>Show a label for the field.</description>
+		</property>
+		<property key="fieldCaption" type="translatableString" required="false" multiline="false">
+			<caption>Label Caption</caption>
+			<category>Appearance</category>
+			<description>Specify the caption to use for the label</description>
+		</property>
     </properties>
 </widget>
 

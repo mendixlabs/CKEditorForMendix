@@ -8,6 +8,7 @@ define([
         'dijit/_TemplatedMixin',
         'mxui/dom',
         'dojo/dom-style',
+        'dojo/dom-class',
         'dojo/dom-construct',
         'dojo/_base/array',
         'dojo/_base/lang',
@@ -15,7 +16,7 @@ define([
         'CKEditorForMendix/widget/lib/jquery-1.11.1',
         'CKEditorForMendix/widget/lib/ckeditor',
         'dojo/text!CKEditorForMendix/widget/templates/CKEditorForMendix.html'
-    ], function (declare, _WidgetBase, _TemplatedMixin, dom, domStyle, domConstruct, dojoArray, lang, text, _jQuery, _CKEditor, widgetTemplate) {
+    ], function (declare, _WidgetBase, _TemplatedMixin, dom, domStyle, dojoClass, domConstruct, dojoArray, lang, text, _jQuery, _CKEditor, widgetTemplate) {
     'use strict';
 
     var $ = _jQuery.noConflict(true);
@@ -48,6 +49,19 @@ define([
             if (!this.readOnly) {
                 this._createChildNodes();
                 this._setupEvents();
+            }
+        },
+
+        postCreate: function () {
+            if( this.showLabel ) {
+                if (dojoClass.contains(this.ckEditorLabel, 'hidden')) {
+                    dojoClass.remove(this.ckEditorLabel, 'hidden');
+                }
+                this.ckEditorLabel.innerHTML = this.fieldCaption;
+            } else {
+                if (!dojoClass.contains(this.ckEditorLabel, 'hidden')) {
+                    dojoClass.add(this.ckEditorLabel, 'hidden');
+                }
             }
         },
 

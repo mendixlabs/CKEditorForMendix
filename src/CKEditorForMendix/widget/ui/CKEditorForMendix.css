@@ -1,9 +1,4 @@
-/**
- * Copyright 2014 - Mendix Technology BV
- *
- * Author: ...
- * Description: ... 
- */
-
- .wgt-widgetname {
- }
+.ckEditorLabel {
+	font-weight: normal;
+	color: #666664;
+}
