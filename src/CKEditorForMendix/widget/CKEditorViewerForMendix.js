@@ -20,7 +20,7 @@ define([
 		_handles: null,
 
 		update: function (obj, callback) {
-			console.log('CKEditorViewerForMendixNode - update');
+			//console.log('CKEditorViewerForMendixNode - update');
 			
 			this._contextObj = obj;
 			this._resetSubscriptions();

@@ -77,8 +77,8 @@ define([
 
 
         _setupEvents: function () {
-            // On key press event
-            this._editor.on('key', lang.hitch(this, function () {
+            // On change event (== on keypress)
+            this._editor.on('change', lang.hitch(this, function () {
                 this._editorChange(this._editor.getData());
 
                 if (this.onKeyPressMicroflow) {
@@ -97,7 +97,7 @@ define([
                 }
             }));
 
-            //On change event
+            //On blur (unselecting the textbox) event
             this._editor.on('blur', lang.hitch(this, function (e) {
                 if (this._editor.checkDirty() && this.onChangeMicroflow) {
                     mx.data.action({
@@ -361,7 +361,7 @@ define([
         uninitialize: function () {
             if (this._editor) {
                 this._editor.removeAllListeners();
-                this._CKEditor.remove(this._editor);
+                this._editor.destroy();
             }
         }
     });

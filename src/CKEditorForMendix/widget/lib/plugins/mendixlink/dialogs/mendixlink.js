@@ -36,7 +36,7 @@ CKEDITOR.dialog.add( 'mendixlinkDialog', function( editor ) {
                             
                             // Create an array that contains all the values a person can pick.
                             if ( typeof editor.mendixWidgetConfig !== 'undefined' && typeof editor.mendixWidgetConfig.microflowLinks !== 'undefined' ){
-                                console.log(editor);
+                                //console.log(editor);
                                 
                                 for (i = 0; i < editor.mendixWidgetConfig.microflowLinks.length; i++){
                                     data.push( [ editor.mendixWidgetConfig.microflowLinks[i].functionNames ] );
