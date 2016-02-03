@@ -27,6 +27,8 @@ define([
         _hasStarted : false,
         _isReadOnly: false,
 
+        _focus: false,
+
         // Extra variables
         _extraContentDiv: null,
         _editor: null,
@@ -52,8 +54,8 @@ define([
             }
 
             if (this.readOnly || this.get("disabled") || this.readonly) {
-				this._isReadOnly = true;
-			}
+                this._isReadOnly = true;
+            }
         },
 
         update: function (obj, callback) {
@@ -86,8 +88,13 @@ define([
                 }
             }));
 
+            this._editor.on("focus", lang.hitch(this, function (e) {
+                this._focus = true;
+            }));
+
             //On blur (unselecting the textbox) event
             this._editor.on("blur", lang.hitch(this, function (e) {
+                this._focus = false;
                 if (this._editor.checkDirty() && this.onChangeMicroflow) {
                     mx.data.action({
                         params: {
@@ -303,7 +310,12 @@ define([
             });
 
             this.domNode.appendChild(this._alertdiv);
+        },
 
+        _updateAttrRendering: function () {
+            if (!this._focus) {
+                this._updateRendering();
+            }
         },
 
         _updateRendering: function (callback) {
@@ -337,6 +349,7 @@ define([
         _resetSubscriptions: function () {
             logger.debug(this.id + "._resetSubscriptions");
             var objHandle = null,
+                attrHandle = null,
                 validationHandle = null;
 
             // Release handles on previous object, if any.
@@ -354,13 +367,21 @@ define([
                     })
                 });
 
+                attrHandle = this.subscribe({
+                    guid: this._contextObj.getGuid(),
+                    attr: this.messageString,
+                    callback: lang.hitch(this,function(guid,attr,attrValue) {
+                        this._updateAttrRendering();
+                    })
+                });
+
                 validationHandle = mx.data.subscribe({
                     guid: this._contextObj.getGuid(),
                     val: true,
                     callback: lang.hitch(this, this._handleValidation)
                 });
 
-                this._handles = [objHandle, validationHandle];
+                this._handles = [objHandle, attrHandle, validationHandle];
             }
         },
 
