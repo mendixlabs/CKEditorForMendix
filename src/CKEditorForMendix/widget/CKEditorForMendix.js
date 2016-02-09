@@ -40,7 +40,7 @@ define([
         templateString: widgetTemplate,
 
         postCreate: function () {
-            logger.level(logger.DEBUG);
+            //logger.level(logger.DEBUG);
             logger.debug(this.id + ".postCreate");
             if( this.showLabel ) {
                 if (dojoClass.contains(this.ckEditorLabel, "hidden")) {
