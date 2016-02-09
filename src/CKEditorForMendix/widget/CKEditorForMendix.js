@@ -40,7 +40,7 @@ define([
         templateString: widgetTemplate,
 
         postCreate: function () {
-            logger.level(logger.DEBUG);
+            //logger.level(logger.DEBUG);
             logger.debug(this.id + ".postCreate");
             if( this.showLabel ) {
                 if (dojoClass.contains(this.ckEditorLabel, "hidden")) {
@@ -63,7 +63,10 @@ define([
 
             this._contextObj = obj;
             this._resetSubscriptions();
-            this._updateRendering(callback);
+            this._updateRendering(lang.hitch(this, function () {
+                this.mxform.resize();
+                callback();
+            }));
         },
 
         _setupEvents: function () {
@@ -78,6 +81,9 @@ define([
                             applyto: "selection",
                             actionname: this.onKeyPressMicroflow,
                             guids: [this._contextObj.getGuid()]
+                        },
+                        store: {
+                            caller: this.mxform
                         },
                         callback: function (obj) {
                         },
