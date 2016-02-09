@@ -66,7 +66,7 @@ define([
             this._updateRendering(lang.hitch(this, function () {
                 setTimeout(lang.hitch(this, function () {
                     domStyle.set(this.CKEditorForMendixNode, "height", "auto");
-                }), 100);
+                }), 50);
                 callback();
             }));
         },
