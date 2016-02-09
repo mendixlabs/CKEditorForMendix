@@ -32,7 +32,7 @@ define([
         // Extra variables
         _extraContentDiv: null,
         _editor: null,
-        _timer: null,
+        _resizePopup: true,
 
         // CKEditor instances.
         _settings: null,
@@ -40,7 +40,7 @@ define([
         templateString: widgetTemplate,
 
         postCreate: function () {
-            //logger.level(logger.DEBUG);
+            logger.level(logger.DEBUG);
             logger.debug(this.id + ".postCreate");
             if( this.showLabel ) {
                 if (dojoClass.contains(this.ckEditorLabel, "hidden")) {
@@ -64,7 +64,9 @@ define([
             this._contextObj = obj;
             this._resetSubscriptions();
             this._updateRendering(lang.hitch(this, function () {
-                this.mxform.resize();
+                setTimeout(lang.hitch(this, function () {
+                    domStyle.set(this.CKEditorForMendixNode, "height", "auto");
+                }), 100);
                 callback();
             }));
         },
@@ -130,7 +132,7 @@ define([
         // Create child nodes.
         _createChildNodes: function () {
             logger.debug(this.id + "._createChildNodes");
-            this.domNode.appendChild(dom.create("textarea", {
+            this.CKEditorForMendixNode.appendChild(dom.create("textarea", {
                 "name": "html_editor_" + this.id,
                 "id": "html_editor_" + this.id,
                 "rows": "10",
@@ -280,6 +282,8 @@ define([
                 microflowLinks: this.microflowLinks
             };
 
+            //domStyle.set(this.CKEditorForMendixNode, "height", "auto");
+
             // in case of data not loaded into editor, because editor was not ready
             this._updateRendering();
 
@@ -315,7 +319,7 @@ define([
                 innerHTML: msg
             });
 
-            this.domNode.appendChild(this._alertdiv);
+            this.CKEditorForMendixNode.appendChild(this._alertdiv);
         },
 
         _updateAttrRendering: function () {
