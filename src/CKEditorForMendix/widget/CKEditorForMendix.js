@@ -63,12 +63,7 @@ define([
 
             this._contextObj = obj;
             this._resetSubscriptions();
-            this._updateRendering(lang.hitch(this, function () {
-                setTimeout(lang.hitch(this, function () {
-                    domStyle.set(this.CKEditorForMendixNode, "height", "auto");
-                }), 50);
-                callback();
-            }));
+            this._updateRendering(callback);
         },
 
         _setupEvents: function () {
@@ -130,7 +125,7 @@ define([
         },
 
         // Create child nodes.
-        _createChildNodes: function () {
+        _createChildNodes: function (callback) {
             logger.debug(this.id + "._createChildNodes");
             this.CKEditorForMendixNode.appendChild(dom.create("textarea", {
                 "name": "html_editor_" + this.id,
@@ -282,12 +277,12 @@ define([
                 microflowLinks: this.microflowLinks
             };
 
-            //domStyle.set(this.CKEditorForMendixNode, "height", "auto");
+            this._setupEvents();
 
-            // in case of data not loaded into editor, because editor was not ready
-            this._updateRendering();
-
-            //console.debug("ckeditorformendix - createChildNodes events");
+            this._editor.on("instanceReady", lang.hitch(this, function(event) {
+                logger.debug(this.id + "._createChildNodes editor ready, total height: " + $("#" + this.id).height() + ", calling _updateRendering");
+                this._updateRendering(callback);
+            }));
         },
 
         _handleValidation: function (validations) {
@@ -332,27 +327,27 @@ define([
             logger.debug(this.id + "._updateRendering");
 
             if (!this._editor && !this._isReadOnly) {
-                this._createChildNodes();
-                this._setupEvents();
-            }
-
-            if (this._contextObj) {
-                //console.debug(this._contextObj.get(this.messageString));
-
-                domStyle.set(this.domNode, "visibility", "visible");
-
-                if (this._editor !== null) {
-                    this._editor.setData(this._contextObj.get(this.messageString));
-                } else {
-                    logger.warn(this.id + " - Unable to add contents to editor, no _editor object available");
-                }
+                this._createChildNodes(callback);
+                //this._setupEvents();
             } else {
-                domStyle.set(this.domNode, "visibility", "hidden");
-            }
+                if (this._contextObj) {
+                    //console.debug(this._contextObj.get(this.messageString));
 
-            if (callback && typeof callback === "function") {
-                logger.debug(this.id + "._updateRendering.callback");
-                callback();
+                    domStyle.set(this.domNode, "visibility", "visible");
+
+                    if (this._editor !== null) {
+                        this._editor.setData(this._contextObj.get(this.messageString));
+                    } else {
+                        logger.warn(this.id + " - Unable to add contents to editor, no _editor object available");
+                    }
+                } else {
+                    domStyle.set(this.domNode, "visibility", "hidden");
+                }
+
+                if (callback && typeof callback === "function") {
+                    logger.debug(this.id + "._updateRendering.callback");
+                    callback();
+                }
             }
         },
 
