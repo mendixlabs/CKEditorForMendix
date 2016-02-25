@@ -2,7 +2,6 @@ define([
         "dojo/_base/declare",
         "mxui/widget/_WidgetBase",
         "dijit/_TemplatedMixin",
-        "mendix/lib/Upload",
         "mxui/dom",
         "dojo/dom-style",
         "dojo/dom-class",
@@ -14,10 +13,11 @@ define([
         "CKEditorForMendix/widget/lib/jquery-1.11.1",
         "CKEditorForMendix/widget/lib/ckeditor",
         "dojo/text!CKEditorForMendix/widget/templates/CKEditorForMendix.html"
-    ], function (declare, _WidgetBase, _TemplatedMixin, Upload, dom, domStyle, dojoClass, domConstruct, html, dojoArray, lang, text, _jQuery, _CKEditor, widgetTemplate) {
+    ], function (declare, _WidgetBase, _TemplatedMixin, dom, domStyle, dojoClass, domConstruct, html, dojoArray, lang, text, _jQuery, _CKEditor, widgetTemplate) {
     "use strict";
 
-    var $ = _jQuery.noConflict(true);
+    var $ = _jQuery.noConflict(true),
+        Upload = mendix.lib.Upload;
 
     return declare("CKEditorForMendix.widget.CKEditorForMendix", [_WidgetBase, _TemplatedMixin], {
 
