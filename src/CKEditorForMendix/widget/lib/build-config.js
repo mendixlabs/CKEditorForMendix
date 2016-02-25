@@ -111,7 +111,8 @@ var CKBUILDER_CONFIG = {
 		'toolbar' : 1,
 		'undo' : 1,
 		'wsc' : 1,
-		'wysiwygarea' : 1
+		'wysiwygarea' : 1,
+        'videodetector' : 1
 	},
 	languages : {
 		'af' : 1,

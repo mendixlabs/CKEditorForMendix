@@ -13,7 +13,8 @@ define([
         "dojo/text",
         "CKEditorForMendix/widget/lib/jquery-1.11.1",
         "CKEditorForMendix/widget/lib/ckeditor",
-        "dojo/text!CKEditorForMendix/widget/templates/CKEditorForMendix.html"
+        "dojo/text!CKEditorForMendix/widget/templates/CKEditorForMendix.html",
+        "CKEditorForMendix/widget/lib/jquery.oembed",
     ], function (declare, _WidgetBase, _TemplatedMixin, Upload, dom, domStyle, dojoClass, domConstruct, html, dojoArray, lang, text, _jQuery, _CKEditor, widgetTemplate) {
     "use strict";
 
@@ -39,6 +40,14 @@ define([
         _imageReference: null,
         _setReference: false,
 
+        ckeditorPlugins: [
+            "divarea",
+            "mendixlink",
+            "tableresize",
+            "oembed",
+            "widget"
+        ],
+
         // CKEditor instances.
         _settings: null,
 
@@ -48,6 +57,7 @@ define([
             logger.debug(this.id + ".postCreate");
 
             this._CKEditor = window.CKEDITOR;
+            this._CKEditor.jQuery = $;
 
             if (this.imageentity) {
                 var split = this.imageentity.split("/");
@@ -150,6 +160,16 @@ define([
             }
         },
 
+        _getPlugins: function (imageUpload) {
+            var plugins = this.ckeditorPlugins;
+            if (imageUpload) {
+                plugins.push("uploadimage");
+            } else {
+                plugins.push("pastebase64");
+            }
+            return plugins.join(",");
+        },
+
         // Create child nodes.
         _createChildNodes: function (callback) {
             logger.debug(this.id + "._createChildNodes");
@@ -169,7 +189,8 @@ define([
             this._settings = [];
             this._settings[this.id] = {
                 config: {
-                    toolbarGroups: []
+                    toolbarGroups: [],
+                    oembed_WrapperClass: "embededContent"
                 }
             };
 
@@ -278,6 +299,11 @@ define([
                     name: "tools"
                 });
             }
+            if (this.toolbarVideo) {
+                this._settings[this.id].config.toolbarGroups.push({
+                    name: "oembed"
+                });
+            }
             if (this.toolbarOthers) {
                 this._settings[this.id].config.toolbarGroups.push({
                     name: "others"
@@ -285,9 +311,9 @@ define([
             }
 
             if (!this._useImageUpload) {
-                this._settings[this.id].config.extraPlugins = "divarea,mendixlink,tableresize,pastebase64";
+                this._settings[this.id].config.extraPlugins = this._getPlugins(false);
             } else {
-                this._settings[this.id].config.extraPlugins = "divarea,mendixlink,tableresize,uploadimage";
+                this._settings[this.id].config.extraPlugins = this._getPlugins(true);
                 this._settings[this.id].config.imageUploadUrl = "http://localhost/"; // not used
             }
 
