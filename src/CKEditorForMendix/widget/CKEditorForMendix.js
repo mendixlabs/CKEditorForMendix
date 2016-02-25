@@ -13,8 +13,7 @@ define([
         "dojo/text",
         "CKEditorForMendix/widget/lib/jquery-1.11.1",
         "CKEditorForMendix/widget/lib/ckeditor",
-        "dojo/text!CKEditorForMendix/widget/templates/CKEditorForMendix.html",
-        "CKEditorForMendix/widget/lib/jquery.oembed",
+        "dojo/text!CKEditorForMendix/widget/templates/CKEditorForMendix.html"
     ], function (declare, _WidgetBase, _TemplatedMixin, Upload, dom, domStyle, dojoClass, domConstruct, html, dojoArray, lang, text, _jQuery, _CKEditor, widgetTemplate) {
     "use strict";
 
@@ -44,7 +43,7 @@ define([
             "divarea",
             "mendixlink",
             "tableresize",
-            "oembed",
+            "embed",
             "widget"
         ],
 
@@ -297,11 +296,6 @@ define([
             if (this.toolbarTools) {
                 this._settings[this.id].config.toolbarGroups.push({
                     name: "tools"
-                });
-            }
-            if (this.toolbarVideo) {
-                this._settings[this.id].config.toolbarGroups.push({
-                    name: "oembed"
                 });
             }
             if (this.toolbarOthers) {

@@ -121,11 +121,6 @@
             <category>Document</category>
             <description>Show the others toolbar.</description>
         </property>
-        <property key="toolbarVideo" type="boolean" required="true" defaultValue="true">
-            <caption>Video</caption>
-            <category>Document</category>
-            <description>Show the video toolbar.</description>
-        </property>
         <property key="bodyCssClass" type="string" required="false">
             <caption>Body CSS Class</caption>
             <category>Appearance</category>
