@@ -172,7 +172,7 @@
 			<category>Images</category>
 			<description>When setting the Image mode to 'Upload', please set this Entity. This domain entity will be insertable as image. Should inherit from System.Image</description>
 		</property>
-        <property key="imageUploadMicroflow" type="microflow" required="false">
+        <property key="imageUploadMicroflow" type="microflow" required="false" entityProperty="imageentity">
             <caption> Image upload Microflow</caption>
             <category>Images</category>
             <description>Microflow which is triggered when the image is uploaded</description>

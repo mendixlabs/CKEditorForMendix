@@ -21,6 +21,9 @@ define([
 
     return declare("CKEditorForMendix.widget.CKEditorForMendix", [_WidgetBase, _TemplatedMixin], {
 
+        // Set by the Modeler
+        imageUploadMicroflow: "",
+
         // Internal values
         _contextGuid: null,
         _contextObj: null,
@@ -152,6 +155,26 @@ define([
             }));
         },
 
+        _executeMf: function (obj, mf, callback) {
+            logger.debug(this.id + "._executeMf: ", mf);
+            if (obj && mf !== "") {
+                mx.data.action({
+                    params: {
+                        applyto: "selection",
+                        actionname: mf,
+                        guids: [obj.getGuid()]
+                    },
+                    store: {
+                        caller: this.mxform
+                    },
+                    callback: callback || function () {},
+                    error: lang.hitch(this, function (error) {
+                        console.log(this.id + ": An error occurred while executing microflow: " + error.description);
+                    })
+                }, this);
+            }
+        },
+
         _editorChange: function (data) {
             logger.debug(this.id + "._editorChange:", data);
             if (this._contextObj !== null) {
@@ -181,8 +204,6 @@ define([
 
             var seperator1 = null,
                 seperator2 = null;
-
-            //console.debug("ckeditorformendix - BASEPATH - " + window.CKEDITOR_BASEPATH);
 
             // Create new config
             this._settings = [];
@@ -375,6 +396,11 @@ define([
                             logger.debug(this.id + "._fileUploadRequest uploaded");
                             fileLoader.url = "file?target=internal&guid=" + guid;
                             fileLoader.changeStatus("uploaded");
+
+                            if (this.imageUploadMicroflow) {
+                                this._executeMf(obj, this.imageUploadMicroflow);
+                            }
+
                             this._editor.fire("change");
                         }),
                         error: lang.hitch(this, function (err) {
@@ -498,35 +524,35 @@ define([
             }
         },
 
-        //invokes callback with the number of items matching query
-		_getCount: function (query, callback) {
-			query = query.replace(/\[\%CurrentObject\%\]/gi, this._contextObj);
-			mx.data.get({
-				xpath : query,
-				callback : callback,
-				count : true
-			});
-		},
-
-		//retrieve objects by query. offset default to zero, limit defaults to one.
-		_getObjects: function (query, callback, offset, limit) {
-			query = query.replace(/\[\%CurrentObject\%\]/gi, this._contextObj);
-            mx.data.get({
-                xpath: query,
-                callback: callback,
-                filter: {
-                    offset: offset || 0,
-                    limit: limit || 1
-                }
-            });
-		},
-
-        getSearchConstraint: function (attr, search) {
-			if(dojo.isString(search) && dojo.isString(attr) && attr !== "") {
-				return "[contains(" + attr + ", '" + html.escapeString(search) + "')]";
-			}
-			return "";
-		},
+        // //invokes callback with the number of items matching query
+		// _getCount: function (query, callback) {
+		// 	query = query.replace(/\[\%CurrentObject\%\]/gi, this._contextObj);
+		// 	mx.data.get({
+		// 		xpath : query,
+		// 		callback : callback,
+		// 		count : true
+		// 	});
+		// },
+        //
+		// //retrieve objects by query. offset default to zero, limit defaults to one.
+		// _getObjects: function (query, callback, offset, limit) {
+		// 	query = query.replace(/\[\%CurrentObject\%\]/gi, this._contextObj);
+        //     mx.data.get({
+        //         xpath: query,
+        //         callback: callback,
+        //         filter: {
+        //             offset: offset || 0,
+        //             limit: limit || 1
+        //         }
+        //     });
+		// },
+        //
+        // getSearchConstraint: function (attr, search) {
+		// 	if(dojo.isString(search) && dojo.isString(attr) && attr !== "") {
+		// 		return "[contains(" + attr + ", '" + html.escapeString(search) + "')]";
+		// 	}
+		// 	return "";
+		// },
 
         uninitialize: function () {
             logger.debug(this.id + ".uninitialize");
