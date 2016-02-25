@@ -1,38 +1,43 @@
-/*global logger */
-
 define([
         "dojo/_base/declare",
         "mxui/widget/_WidgetBase",
         "dijit/_TemplatedMixin",
+        "mendix/lib/Upload",
         "mxui/dom",
         "dojo/dom-style",
         "dojo/dom-class",
         "dojo/dom-construct",
+        "dojo/html",
         "dojo/_base/array",
         "dojo/_base/lang",
         "dojo/text",
         "CKEditorForMendix/widget/lib/jquery-1.11.1",
         "CKEditorForMendix/widget/lib/ckeditor",
         "dojo/text!CKEditorForMendix/widget/templates/CKEditorForMendix.html"
-    ], function (declare, _WidgetBase, _TemplatedMixin, dom, domStyle, dojoClass, domConstruct, dojoArray, lang, text, _jQuery, _CKEditor, widgetTemplate) {
+    ], function (declare, _WidgetBase, _TemplatedMixin, Upload, dom, domStyle, dojoClass, domConstruct, html, dojoArray, lang, text, _jQuery, _CKEditor, widgetTemplate) {
     "use strict";
 
     var $ = _jQuery.noConflict(true);
 
     return declare("CKEditorForMendix.widget.CKEditorForMendix", [_WidgetBase, _TemplatedMixin], {
+
+        // Internal values
         _contextGuid: null,
         _contextObj: null,
         _handles: null,
         _alertdiv: null,
         _hasStarted : false,
         _isReadOnly: false,
-
         _focus: false,
 
         // Extra variables
         _extraContentDiv: null,
         _editor: null,
         _resizePopup: true,
+        _useImageUpload: false,
+        _imageEntity: "",
+        _imageReference: null,
+        _setReference: false,
 
         // CKEditor instances.
         _settings: null,
@@ -40,8 +45,21 @@ define([
         templateString: widgetTemplate,
 
         postCreate: function () {
-            //logger.level(logger.DEBUG);
             logger.debug(this.id + ".postCreate");
+
+            this._CKEditor = window.CKEDITOR;
+
+            if (this.imageentity) {
+                var split = this.imageentity.split("/");
+                if (split.length === 1) {
+                    this._imageEntity = split[0];
+                } else {
+                    this._imageEntity = split[split.length - 1];
+                    this._imageReference = split[0];
+                    this._setReference = true;
+                }
+            }
+
             if( this.showLabel ) {
                 if (dojoClass.contains(this.ckEditorLabel, "hidden")) {
                     dojoClass.remove(this.ckEditorLabel, "hidden");
@@ -55,6 +73,14 @@ define([
 
             if (this.readOnly || this.get("disabled") || this.readonly) {
                 this._isReadOnly = true;
+            }
+
+            if (this.imagePasteMode === "upload") {
+                if (this.imageentity) {
+                    this._useImageUpload = true;
+                } else {
+                    console.warn(this.id + " you have set the Image mode to 'upload', but you have not set the entity yet");
+                }
             }
         },
 
@@ -146,8 +172,6 @@ define([
                     toolbarGroups: []
                 }
             };
-
-            this._CKEditor = window.CKEDITOR;
 
             // Collapsable toolbar
             this._settings[this.id].config.toolbarCanCollapse = true;
@@ -260,6 +284,13 @@ define([
                 });
             }
 
+            if (!this._useImageUpload) {
+                this._settings[this.id].config.extraPlugins = "divarea,mendixlink,tableresize,pastebase64";
+            } else {
+                this._settings[this.id].config.extraPlugins = "divarea,mendixlink,tableresize,uploadimage";
+                this._settings[this.id].config.imageUploadUrl = "http://localhost/"; // not used
+            }
+
             // Create a CKEditor from HTML element.
             this._editor = this._CKEditor.replace("html_editor_" + this.id, this._settings[this.id].config);
 
@@ -283,6 +314,66 @@ define([
                 logger.debug(this.id + "._createChildNodes editor ready, total height: " + $("#" + this.id).height() + ", calling _updateRendering");
                 this._updateRendering(callback);
             }));
+
+            if (this._useImageUpload) {
+                this._editor.on( "fileUploadRequest", lang.hitch(this, this._fileUploadRequest));
+            }
+        },
+
+        _fileUploadRequest: function (evt) {
+            logger.debug(this.id + "._fileUploadRequest");
+            var fileLoader = evt.data.fileLoader,
+                file = fileLoader.file;
+
+            mx.data.create({
+                entity: this._imageEntity,
+                callback: lang.hitch(this, function (obj) {
+                    logger.debug(this.id + "._fileUploadRequest Image entity created");
+
+                    if (this._setReference && this._imageReference) {
+                        this._contextObj.addReference(this._imageReference, obj.getGuid());
+                    }
+
+                    var guid = obj.getGuid();
+                    var upload = new Upload({
+                        objectGuid: guid,
+                        startUpload: lang.hitch(this, function () {
+                            logger.debug(this.id + "._fileUploadRequest uploading");
+                            fileLoader.changeStatus("uploading");
+                        }),
+                        finishUpload: lang.hitch(this, function () {
+                            logger.debug(this.id + "._fileUploadRequest finished uploading");
+                        }),
+                        form: {
+                            mxdocument: {
+                                files: [
+                                    file
+                                ]
+                            }
+                        },
+                        callback: lang.hitch(this, function () {
+                            logger.debug(this.id + "._fileUploadRequest uploaded");
+                            fileLoader.url = "file?target=internal&guid=" + guid;
+                            fileLoader.changeStatus("uploaded");
+                            this._editor.fire("change");
+                        }),
+                        error: lang.hitch(this, function (err) {
+                            console.error(this.id + "._fileUploadRequest error uploading", arguments);
+                            fileLoader.message = "Error uploading: " + err.toString();
+                            fileLoader.changeStatus("error");
+                        })
+                    });
+
+                    upload.upload();
+                }),
+                error: lang.hitch(this, function (err) {
+                    logger.debug(this.id + "._fileUploadRequest Image entity failed to create");
+                    fileLoader.message = "Error uploading: " + err.toString();
+                    fileLoader.changeStatus("error");
+                }),
+                scope: this._contextObj
+            });
+            evt.stop();
         },
 
         _handleValidation: function (validations) {
@@ -328,11 +419,8 @@ define([
 
             if (!this._editor && !this._isReadOnly) {
                 this._createChildNodes(callback);
-                //this._setupEvents();
             } else {
                 if (this._contextObj) {
-                    //console.debug(this._contextObj.get(this.messageString));
-
                     domStyle.set(this.domNode, "visibility", "visible");
 
                     if (this._editor !== null) {
@@ -389,6 +477,36 @@ define([
                 this._handles = [objHandle, attrHandle, validationHandle];
             }
         },
+
+        //invokes callback with the number of items matching query
+		_getCount: function (query, callback) {
+			query = query.replace(/\[\%CurrentObject\%\]/gi, this._contextObj);
+			mx.data.get({
+				xpath : query,
+				callback : callback,
+				count : true
+			});
+		},
+
+		//retrieve objects by query. offset default to zero, limit defaults to one.
+		_getObjects: function (query, callback, offset, limit) {
+			query = query.replace(/\[\%CurrentObject\%\]/gi, this._contextObj);
+            mx.data.get({
+                xpath: query,
+                callback: callback,
+                filter: {
+                    offset: offset || 0,
+                    limit: limit || 1
+                }
+            });
+		},
+
+        getSearchConstraint: function (attr, search) {
+			if(dojo.isString(search) && dojo.isString(attr) && attr !== "") {
+				return "[contains(" + attr + ", '" + html.escapeString(search) + "')]";
+			}
+			return "";
+		},
 
         uninitialize: function () {
             logger.debug(this.id + ".uninitialize");
