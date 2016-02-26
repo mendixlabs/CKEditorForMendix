@@ -35,3 +35,30 @@ The CKEditor widget comes with the CKEditor viewer. This viewer will enable the 
 ### Example of someone clicking the button.
 
 ![test](https://github.com/mendix/CKEditorForMendix/raw/master/assets/microflow_executed.png)
+
+## Images
+
+The CKEditor comes with two modes to handle images:
+
+- Paste them as a base64 string ([Inline images](https://en.wikipedia.org/wiki/Data_URI_scheme))
+- Upload them to Mendix
+
+You can set this mode using the 'Images' tab in your widget configuration in the Modeler
+
+-- Insert image --
+
+### Mode 'Upload'
+
+- Make sure the Entity is inherited from System.Image. You can use a reference, in that case the context will set references to the uploaded images.
+- You can set an XPath constraint on the images in the Image browser that you can reach in the CKEditor by clicking -- Add icon --
+- Upload only works when you drag an image from your explorer (for example Windows Explorer) directly in the editor (so Copy + Paste does not work due to browser inconsistensies)
+
+## Behaviour
+
+The widget has a few options that you can set as default behaviour in the CKEditor
+
+-- Insert Image -- 
+
+- Entermode: Default behaviour for the editor when pressing Enter. This is Paragraph by default
+- Shift-Entermode: Default behaviour for the editor when pressing Shift + Enter. For example, in Word, when you are working in a list and you want to add an extra rule to your list-item, you use Shift+Enter. By default this should be BR.
+- Autoparagraph: It is recommended to leave this to true. In the CKEditor you can turn it off, but it is not recommended.
