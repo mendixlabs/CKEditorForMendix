@@ -36,7 +36,7 @@
                 <enumerationValue key="DIV">Blocks (DIV)</enumerationValue>
             </enumerationValues>
         </property>
-        <property key="shiftEnterMode" type="enumeration" defaultValue="P">
+        <property key="shiftEnterMode" type="enumeration" defaultValue="BR">
             <caption>Shift-Entermode</caption>
             <category>Behavior</category>
             <description>Set the behavior of the Shift+Enter key</description>
@@ -178,10 +178,10 @@
             <description>Microflow which is triggered when the image is uploaded</description>
             <returnType type="Void" />
         </property>
-		<!-- <property key="imageconstraint" type="entityConstraint" entityProperty="imageentity" required="false">
+		<property key="imageconstraint" type="entityConstraint" entityProperty="imageentity" required="false">
 			<caption>XPath Constraint</caption>
 			<category>Images</category>
 			<description>This constraint might be used to filter the set of browsable images. (not functional right now)</description>
-		</property> -->
+		</property>
     </properties>
 </widget>

@@ -48,7 +48,8 @@ define([
             "mendixlink",
             "tableresize",
             "oembed",
-            "widget"
+            "widget",
+            "simple-image-browser"
         ],
 
         // CKEditor instances.
@@ -61,6 +62,7 @@ define([
 
             this._CKEditor = window.CKEDITOR;
             this._CKEditor.jQuery = $;
+            this._CKEditor.getImages = lang.hitch(this, this.retrieveImages);
 
             if (this.imageentity) {
                 var split = this.imageentity.split("/");
@@ -101,6 +103,7 @@ define([
             logger.debug(this.id + ".update");
 
             this._contextObj = obj;
+
             this._resetSubscriptions();
             this._updateRendering(callback);
         },
@@ -525,35 +528,40 @@ define([
             }
         },
 
-        // //invokes callback with the number of items matching query
-		// _getCount: function (query, callback) {
-		// 	query = query.replace(/\[\%CurrentObject\%\]/gi, this._contextObj);
-		// 	mx.data.get({
-		// 		xpath : query,
-		// 		callback : callback,
-		// 		count : true
-		// 	});
-		// },
-        //
-		// //retrieve objects by query. offset default to zero, limit defaults to one.
-		// _getObjects: function (query, callback, offset, limit) {
-		// 	query = query.replace(/\[\%CurrentObject\%\]/gi, this._contextObj);
-        //     mx.data.get({
-        //         xpath: query,
-        //         callback: callback,
-        //         filter: {
-        //             offset: offset || 0,
-        //             limit: limit || 1
-        //         }
-        //     });
-		// },
-        //
-        // getSearchConstraint: function (attr, search) {
-		// 	if(dojo.isString(search) && dojo.isString(attr) && attr !== "") {
-		// 		return "[contains(" + attr + ", '" + html.escapeString(search) + "')]";
-		// 	}
-		// 	return "";
-		// },
+        retrieveImages: function (callback) {
+            this.retrieveImageObjects(function (objs) {
+                var images = [];
+                dojo.forEach(objs, function (obj, i) {
+                    images.push({
+                        thumbnailUrl: "file?target=internal&guid=" + obj.getGuid() + "&thumb=true",
+                        imageUrl:  "file?target=internal&guid=" + obj.getGuid()
+                    });
+                });
+                callback(images);
+            });
+        },
+
+		retrieveImageObjects : function (callback, offset, search) {
+            logger.debug(this.id + ".retrieveImages");
+			this._getObjects("//" + this._imageEntity + this.imageconstraint + this.getSearchConstraint("Name", search), callback);
+		},
+
+		_getObjects: function (query, callback) {
+            logger.debug(this.id + "._getObjects");
+			query = query.replace(/\[\%CurrentObject\%\]/gi, this._contextObj);
+            mx.data.get({
+                xpath: query,
+                callback: callback
+            });
+		},
+
+        getSearchConstraint: function (attr, search) {
+            logger.debug(this.id + ".getSearchConstraint");
+			if(dojo.isString(search) && dojo.isString(attr) && attr !== "") {
+				return "[contains(" + attr + ", '" + html.escapeString(search) + "')]";
+			}
+			return "";
+		},
 
         uninitialize: function () {
             logger.debug(this.id + ".uninitialize");

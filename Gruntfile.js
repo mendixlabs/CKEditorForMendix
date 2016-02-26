@@ -56,7 +56,8 @@ module.exports = function (grunt) {
             autoDeployUpdate: {
                 "files": [
                     "./src/**/*",
-                    "!./src/CKEditorForMendix/widget/lib/plugins/**/*"
+                    "!./src/CKEditorForMendix/widget/lib/plugins/**/*",
+                    "./src/CKEditorForMendix/widget/lib/plugins/simple-image-browser/*"
                 ],
                 "tasks": [ "compress", "newer:copy" ],
                 options: {
