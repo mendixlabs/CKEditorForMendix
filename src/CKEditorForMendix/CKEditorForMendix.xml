@@ -158,6 +158,11 @@
 			<category>Appearance</category>
 			<description>Specify the caption to use for the label</description>
 		</property>
+        <property key="maximizeOffset" type="integer" required="true" defaultValue="0">
+			<caption>Maximize offset</caption>
+			<category>Appearance</category>
+			<description>Specify the pixel offset when maximizing the widget. Sometimes a Mendix app will contain a toolbar at the top that will overlap the maximized editor. Usually this is 50px.</description>
+		</property>
         <property key="imagePasteMode" type="enumeration" defaultValue="base64">
             <caption>Image Mode</caption>
             <category>Images</category>

@@ -49,7 +49,8 @@ define([
             "tableresize",
             "oembed",
             "widget",
-            "simple-image-browser"
+            "simple-image-browser",
+            "maximize"
         ],
 
         // CKEditor instances.
@@ -220,6 +221,9 @@ define([
 
             // Collapsable toolbar
             this._settings[this.id].config.toolbarCanCollapse = true;
+
+            // Maximize offset
+            this._settings[this.id].config.maximizeOffset = this.maximizeOffset;
 
             // Autogrow functionality of the editor.
             this._settings[this.id].config.autoGrow_minHeight = 300;
