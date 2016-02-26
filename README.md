@@ -45,7 +45,7 @@ The CKEditor comes with two modes to handle images:
 
 You can set this mode using the 'Images' tab in your widget configuration in the Modeler
 
--- Insert image --
+![images](https://github.com/mendix/CKEditorForMendix/raw/master/assets/images.png)
 
 ### Mode 'Upload'
 
@@ -57,7 +57,7 @@ You can set this mode using the 'Images' tab in your widget configuration in the
 
 The widget has a few options that you can set as default behaviour in the CKEditor
 
--- Insert Image -- 
+![behaviour](https://github.com/mendix/CKEditorForMendix/raw/master/assets/behaviour.png)
 
 - Entermode: Default behaviour for the editor when pressing Enter. This is Paragraph by default
 - Shift-Entermode: Default behaviour for the editor when pressing Shift + Enter. For example, in Word, when you are working in a list and you want to add an extra rule to your list-item, you use Shift+Enter. By default this should be BR.
