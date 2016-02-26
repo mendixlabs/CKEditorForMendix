@@ -12,7 +12,8 @@ define([
         "dojo/text",
         "CKEditorForMendix/widget/lib/jquery-1.11.1",
         "CKEditorForMendix/widget/lib/ckeditor",
-        "dojo/text!CKEditorForMendix/widget/templates/CKEditorForMendix.html"
+        "dojo/text!CKEditorForMendix/widget/templates/CKEditorForMendix.html",
+        "CKEditorForMendix/widget/lib/jquery.oembed"
     ], function (declare, _WidgetBase, _TemplatedMixin, dom, domStyle, dojoClass, domConstruct, html, dojoArray, lang, text, _jQuery, _CKEditor, widgetTemplate) {
     "use strict";
 
@@ -46,7 +47,7 @@ define([
             "divarea",
             "mendixlink",
             "tableresize",
-            "embed",
+            "oembed",
             "widget"
         ],
 
