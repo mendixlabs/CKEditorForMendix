@@ -50,7 +50,7 @@ You can set this mode using the 'Images' tab in your widget configuration in the
 ### Mode 'Upload'
 
 - Make sure the Entity is inherited from System.Image. You can use a reference, in that case the context will set references to the uploaded images.
-- You can set an XPath constraint on the images in the Image browser that you can reach in the CKEditor by clicking -- Add icon --
+- You can set an XPath constraint on the images in the Image browser that you can reach in the CKEditor by clicking ![imagebrowser](https://github.com/mendix/CKEditorForMendix/raw/master/assets/imagebrowser.png)
 - Upload only works when you drag an image from your explorer (for example Windows Explorer) directly in the editor (so Copy + Paste does not work due to browser inconsistensies)
 
 ## Behaviour
@@ -62,3 +62,7 @@ The widget has a few options that you can set as default behaviour in the CKEdit
 - Entermode: Default behaviour for the editor when pressing Enter. This is Paragraph by default
 - Shift-Entermode: Default behaviour for the editor when pressing Shift + Enter. For example, in Word, when you are working in a list and you want to add an extra rule to your list-item, you use Shift+Enter. By default this should be BR.
 - Autoparagraph: It is recommended to leave this to true. In the CKEditor you can turn it off, but it is not recommended.
+
+## Embedding
+
+The widget supports embedding of video's. This can be used by clicking ![imagebrowser](https://github.com/mendix/CKEditorForMendix/raw/master/assets/oembed.png). It will automatically create an embed code when you enter the url of the a video (for example YouTube or Vimeo). For more details on what is supported, please see the [plugin page](http://ckeditor.com/addon/oembed)
