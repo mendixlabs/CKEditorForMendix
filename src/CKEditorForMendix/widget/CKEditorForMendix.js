@@ -1,5 +1,3 @@
-/*global logger */
-
 define([
         "dojo/_base/declare",
         "mxui/widget/_WidgetBase",
@@ -8,31 +6,52 @@ define([
         "dojo/dom-style",
         "dojo/dom-class",
         "dojo/dom-construct",
+        "dojo/html",
         "dojo/_base/array",
         "dojo/_base/lang",
         "dojo/text",
         "CKEditorForMendix/widget/lib/jquery-1.11.1",
         "CKEditorForMendix/widget/lib/ckeditor",
-        "dojo/text!CKEditorForMendix/widget/templates/CKEditorForMendix.html"
-    ], function (declare, _WidgetBase, _TemplatedMixin, dom, domStyle, dojoClass, domConstruct, dojoArray, lang, text, _jQuery, _CKEditor, widgetTemplate) {
+        "dojo/text!CKEditorForMendix/widget/templates/CKEditorForMendix.html",
+        "CKEditorForMendix/widget/lib/jquery.oembed"
+    ], function (declare, _WidgetBase, _TemplatedMixin, dom, domStyle, dojoClass, domConstruct, html, dojoArray, lang, text, _jQuery, _CKEditor, widgetTemplate) {
     "use strict";
 
-    var $ = _jQuery.noConflict(true);
+    var $ = _jQuery.noConflict(true),
+        Upload = mendix.lib.Upload;
 
     return declare("CKEditorForMendix.widget.CKEditorForMendix", [_WidgetBase, _TemplatedMixin], {
+
+        // Set by the Modeler
+        imageUploadMicroflow: "",
+
+        // Internal values
         _contextGuid: null,
         _contextObj: null,
         _handles: null,
         _alertdiv: null,
         _hasStarted : false,
         _isReadOnly: false,
-
         _focus: false,
 
         // Extra variables
         _extraContentDiv: null,
         _editor: null,
         _resizePopup: true,
+        _useImageUpload: false,
+        _imageEntity: "",
+        _imageReference: null,
+        _setReference: false,
+
+        ckeditorPlugins: [
+            "divarea",
+            "mendixlink",
+            "tableresize",
+            "oembed",
+            "widget",
+            "simple-image-browser",
+            "maximize"
+        ],
 
         // CKEditor instances.
         _settings: null,
@@ -40,8 +59,23 @@ define([
         templateString: widgetTemplate,
 
         postCreate: function () {
-            //logger.level(logger.DEBUG);
             logger.debug(this.id + ".postCreate");
+
+            this._CKEditor = window.CKEDITOR;
+            this._CKEditor.jQuery = $;
+            this._CKEditor.getImages = lang.hitch(this, this.retrieveImages);
+
+            if (this.imageentity) {
+                var split = this.imageentity.split("/");
+                if (split.length === 1) {
+                    this._imageEntity = split[0];
+                } else {
+                    this._imageEntity = split[split.length - 1];
+                    this._imageReference = split[0];
+                    this._setReference = true;
+                }
+            }
+
             if( this.showLabel ) {
                 if (dojoClass.contains(this.ckEditorLabel, "hidden")) {
                     dojoClass.remove(this.ckEditorLabel, "hidden");
@@ -56,12 +90,21 @@ define([
             if (this.readOnly || this.get("disabled") || this.readonly) {
                 this._isReadOnly = true;
             }
+
+            if (this.imagePasteMode === "upload") {
+                if (this.imageentity) {
+                    this._useImageUpload = true;
+                } else {
+                    console.warn(this.id + " you have set the Image mode to 'upload', but you have not set the entity yet");
+                }
+            }
         },
 
         update: function (obj, callback) {
             logger.debug(this.id + ".update");
 
             this._contextObj = obj;
+
             this._resetSubscriptions();
             this._updateRendering(callback);
         },
@@ -117,11 +160,41 @@ define([
             }));
         },
 
+        _executeMf: function (obj, mf, callback) {
+            logger.debug(this.id + "._executeMf: ", mf);
+            if (obj && mf !== "") {
+                mx.data.action({
+                    params: {
+                        applyto: "selection",
+                        actionname: mf,
+                        guids: [obj.getGuid()]
+                    },
+                    store: {
+                        caller: this.mxform
+                    },
+                    callback: callback || function () {},
+                    error: lang.hitch(this, function (error) {
+                        console.log(this.id + ": An error occurred while executing microflow: " + error.description);
+                    })
+                }, this);
+            }
+        },
+
         _editorChange: function (data) {
             logger.debug(this.id + "._editorChange:", data);
             if (this._contextObj !== null) {
                 this._contextObj.set(this.messageString, data);
             }
+        },
+
+        _getPlugins: function (imageUpload) {
+            var plugins = this.ckeditorPlugins;
+            if (imageUpload) {
+                plugins.push("uploadimage");
+            } else {
+                plugins.push("pastebase64");
+            }
+            return plugins.join(",");
         },
 
         // Create child nodes.
@@ -137,20 +210,20 @@ define([
             var seperator1 = null,
                 seperator2 = null;
 
-            //console.debug("ckeditorformendix - BASEPATH - " + window.CKEDITOR_BASEPATH);
-
             // Create new config
             this._settings = [];
             this._settings[this.id] = {
                 config: {
-                    toolbarGroups: []
+                    toolbarGroups: [],
+                    oembed_WrapperClass: "embededContent"
                 }
             };
 
-            this._CKEditor = window.CKEDITOR;
-
             // Collapsable toolbar
             this._settings[this.id].config.toolbarCanCollapse = true;
+
+            // Maximize offset
+            this._settings[this.id].config.maximizeOffset = this.maximizeOffset;
 
             // Autogrow functionality of the editor.
             this._settings[this.id].config.autoGrow_minHeight = 300;
@@ -260,6 +333,13 @@ define([
                 });
             }
 
+            if (!this._useImageUpload) {
+                this._settings[this.id].config.extraPlugins = this._getPlugins(false);
+            } else {
+                this._settings[this.id].config.extraPlugins = this._getPlugins(true);
+                this._settings[this.id].config.imageUploadUrl = "http://localhost/"; // not used
+            }
+
             // Create a CKEditor from HTML element.
             this._editor = this._CKEditor.replace("html_editor_" + this.id, this._settings[this.id].config);
 
@@ -283,6 +363,71 @@ define([
                 logger.debug(this.id + "._createChildNodes editor ready, total height: " + $("#" + this.id).height() + ", calling _updateRendering");
                 this._updateRendering(callback);
             }));
+
+            if (this._useImageUpload) {
+                this._editor.on( "fileUploadRequest", lang.hitch(this, this._fileUploadRequest));
+            }
+        },
+
+        _fileUploadRequest: function (evt) {
+            logger.debug(this.id + "._fileUploadRequest");
+            var fileLoader = evt.data.fileLoader,
+                file = fileLoader.file;
+
+            mx.data.create({
+                entity: this._imageEntity,
+                callback: lang.hitch(this, function (obj) {
+                    logger.debug(this.id + "._fileUploadRequest Image entity created");
+
+                    if (this._setReference && this._imageReference) {
+                        this._contextObj.addReference(this._imageReference, obj.getGuid());
+                    }
+
+                    var guid = obj.getGuid();
+                    var upload = new Upload({
+                        objectGuid: guid,
+                        startUpload: lang.hitch(this, function () {
+                            logger.debug(this.id + "._fileUploadRequest uploading");
+                            fileLoader.changeStatus("uploading");
+                        }),
+                        finishUpload: lang.hitch(this, function () {
+                            logger.debug(this.id + "._fileUploadRequest finished uploading");
+                        }),
+                        form: {
+                            mxdocument: {
+                                files: [
+                                    file
+                                ]
+                            }
+                        },
+                        callback: lang.hitch(this, function () {
+                            logger.debug(this.id + "._fileUploadRequest uploaded");
+                            fileLoader.url = "file?target=internal&guid=" + guid;
+                            fileLoader.changeStatus("uploaded");
+
+                            if (this.imageUploadMicroflow) {
+                                this._executeMf(obj, this.imageUploadMicroflow);
+                            }
+
+                            this._editor.fire("change");
+                        }),
+                        error: lang.hitch(this, function (err) {
+                            console.error(this.id + "._fileUploadRequest error uploading", arguments);
+                            fileLoader.message = "Error uploading: " + err.toString();
+                            fileLoader.changeStatus("error");
+                        })
+                    });
+
+                    upload.upload();
+                }),
+                error: lang.hitch(this, function (err) {
+                    logger.debug(this.id + "._fileUploadRequest Image entity failed to create");
+                    fileLoader.message = "Error uploading: " + err.toString();
+                    fileLoader.changeStatus("error");
+                }),
+                scope: this._contextObj
+            });
+            evt.stop();
         },
 
         _handleValidation: function (validations) {
@@ -328,11 +473,8 @@ define([
 
             if (!this._editor && !this._isReadOnly) {
                 this._createChildNodes(callback);
-                //this._setupEvents();
             } else {
                 if (this._contextObj) {
-                    //console.debug(this._contextObj.get(this.messageString));
-
                     domStyle.set(this.domNode, "visibility", "visible");
 
                     if (this._editor !== null) {
@@ -389,6 +531,41 @@ define([
                 this._handles = [objHandle, attrHandle, validationHandle];
             }
         },
+
+        retrieveImages: function (callback) {
+            this.retrieveImageObjects(function (objs) {
+                var images = [];
+                dojo.forEach(objs, function (obj, i) {
+                    images.push({
+                        thumbnailUrl: "file?target=internal&guid=" + obj.getGuid() + "&thumb=true",
+                        imageUrl:  "file?target=internal&guid=" + obj.getGuid()
+                    });
+                });
+                callback(images);
+            });
+        },
+
+		retrieveImageObjects : function (callback, offset, search) {
+            logger.debug(this.id + ".retrieveImages");
+			this._getObjects("//" + this._imageEntity + this.imageconstraint + this.getSearchConstraint("Name", search), callback);
+		},
+
+		_getObjects: function (query, callback) {
+            logger.debug(this.id + "._getObjects");
+			query = query.replace(/\[\%CurrentObject\%\]/gi, this._contextObj);
+            mx.data.get({
+                xpath: query,
+                callback: callback
+            });
+		},
+
+        getSearchConstraint: function (attr, search) {
+            logger.debug(this.id + ".getSearchConstraint");
+			if(dojo.isString(search) && dojo.isString(attr) && attr !== "") {
+				return "[contains(" + attr + ", '" + html.escapeString(search) + "')]";
+			}
+			return "";
+		},
 
         uninitialize: function () {
             logger.debug(this.id + ".uninitialize");

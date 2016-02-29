@@ -54,7 +54,11 @@ module.exports = function (grunt) {
     grunt.initConfig({
         watch: {
             autoDeployUpdate: {
-                "files": [ "./src/**/*" ],
+                "files": [
+                    "./src/**/*",
+                    "!./src/CKEditorForMendix/widget/lib/plugins/**/*",
+                    "./src/CKEditorForMendix/widget/lib/plugins/simple-image-browser/*"
+                ],
                 "tasks": [ "compress", "newer:copy" ],
                 options: {
                     debounceDelay: 250,

@@ -36,7 +36,7 @@
                 <enumerationValue key="DIV">Blocks (DIV)</enumerationValue>
             </enumerationValues>
         </property>
-        <property key="shiftEnterMode" type="enumeration" defaultValue="P">
+        <property key="shiftEnterMode" type="enumeration" defaultValue="BR">
             <caption>Shift-Entermode</caption>
             <category>Behavior</category>
             <description>Set the behavior of the Shift+Enter key</description>
@@ -158,6 +158,35 @@
 			<category>Appearance</category>
 			<description>Specify the caption to use for the label</description>
 		</property>
+        <property key="maximizeOffset" type="integer" required="true" defaultValue="0">
+			<caption>Maximize offset</caption>
+			<category>Appearance</category>
+			<description>Specify the pixel offset when maximizing the widget. Sometimes a Mendix app will contain a toolbar at the top that will overlap the maximized editor. Usually this is 50px.</description>
+		</property>
+        <property key="imagePasteMode" type="enumeration" defaultValue="base64">
+            <caption>Image Mode</caption>
+            <category>Images</category>
+            <description>Would you like to include the images as base64 strings or upload them?</description>
+            <enumerationValues>
+                <enumerationValue key="base64">Base64</enumerationValue>
+                <enumerationValue key="upload">Upload</enumerationValue>
+            </enumerationValues>
+        </property>
+        <property key="imageentity" type="entity" required="false" isPath="optional" pathType="referenceSet">
+			<caption>Image Entity</caption>
+			<category>Images</category>
+			<description>When setting the Image mode to 'Upload', please set this Entity. This domain entity will be insertable as image. Should inherit from System.Image</description>
+		</property>
+        <property key="imageUploadMicroflow" type="microflow" required="false" entityProperty="imageentity">
+            <caption> Image upload Microflow</caption>
+            <category>Images</category>
+            <description>Microflow which is triggered when the image is uploaded</description>
+            <returnType type="Void" />
+        </property>
+		<property key="imageconstraint" type="entityConstraint" entityProperty="imageentity" required="false">
+			<caption>XPath Constraint</caption>
+			<category>Images</category>
+			<description>This constraint might be used to filter the set of browsable images. (not functional right now)</description>
+		</property>
     </properties>
 </widget>
-
