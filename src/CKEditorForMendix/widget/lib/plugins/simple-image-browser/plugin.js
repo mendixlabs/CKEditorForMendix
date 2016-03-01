@@ -54,7 +54,7 @@ CKEDITOR.plugins.add('simple-image-browser', {
           var dialog = event.data;
           if (dialog.getName() === 'simple-image-browser-dialog') {
             CKEDITOR.getImages(function (images) {
-                console.log(images);
+                //console.log(images);
                 var txt = "";
                 $.each(images, function(key, value) {
                     var element = [

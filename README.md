@@ -13,7 +13,7 @@ For more information on contributing to this repository visit [Contributing to a
 ## Typical usage scenario
 
 Use this widget to add a full WYSIWYG editor for your entity attributes. This version has the ability to add links to HTML that can run microflows when clicked uppon.
- 
+
 ## Description
 
 The CKEditor widget comes with the CKEditor viewer. This viewer will enable the posibility to reformat links to microflow links.
@@ -50,7 +50,7 @@ You can set this mode using the 'Images' tab in your widget configuration in the
 ### Mode 'Upload'
 
 - Make sure the Entity is inherited from System.Image. You can use a reference, in that case the context will set references to the uploaded images.
-- You can set an XPath constraint on the images in the Image browser that you can reach in the CKEditor by clicking ![imagebrowser](https://github.com/mendix/CKEditorForMendix/raw/master/assets/imagebrowser.png)
+- You can set an XPath constraint on the images in the Image browser that you can reach in the CKEditor by clicking ![imagebrowser](https://github.com/mendix/CKEditorForMendix/raw/master/assets/imagebrowser.png). This Image browser is only enabled when you have set Mode to 'Upload' and added an Entity
 - Upload only works when you drag an image from your explorer (for example Windows Explorer) directly in the editor (so Copy + Paste does not work due to browser inconsistensies)
 
 ## Behaviour

@@ -49,8 +49,10 @@ define([
             "tableresize",
             "oembed",
             "widget",
+            "maximize",
+            "uploadimage",
             "simple-image-browser",
-            "maximize"
+            "pastebase64"
         ],
 
         // CKEditor instances.
@@ -189,11 +191,6 @@ define([
 
         _getPlugins: function (imageUpload) {
             var plugins = this.ckeditorPlugins;
-            if (imageUpload) {
-                plugins.push("uploadimage");
-            } else {
-                plugins.push("pastebase64");
-            }
             return plugins.join(",");
         },
 
@@ -333,11 +330,13 @@ define([
                 });
             }
 
+            this._settings[this.id].config.imageUploadUrl = "http://localhost/"; // not used
             if (!this._useImageUpload) {
                 this._settings[this.id].config.extraPlugins = this._getPlugins(false);
+                this._settings[this.id].config.removePlugins = "simple-image-browser,uploadimage";
             } else {
                 this._settings[this.id].config.extraPlugins = this._getPlugins(true);
-                this._settings[this.id].config.imageUploadUrl = "http://localhost/"; // not used
+                this._settings[this.id].config.removePlugins = "pastebase64"
             }
 
             // Create a CKEditor from HTML element.
@@ -357,6 +356,8 @@ define([
                 microflowLinks: this.microflowLinks
             };
 
+            console.log(this._editor);
+
             this._setupEvents();
 
             this._editor.on("instanceReady", lang.hitch(this, function(event) {
@@ -366,6 +367,8 @@ define([
 
             if (this._useImageUpload) {
                 this._editor.on( "fileUploadRequest", lang.hitch(this, this._fileUploadRequest));
+            } else {
+
             }
         },
 
