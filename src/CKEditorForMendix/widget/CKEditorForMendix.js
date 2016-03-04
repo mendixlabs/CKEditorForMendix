@@ -362,6 +362,30 @@ define([
 
             this._editor.on("instanceReady", lang.hitch(this, function(event) {
                 logger.debug(this.id + "._createChildNodes editor ready, total height: " + $("#" + this.id).height() + ", calling _updateRendering");
+
+                // Add filters for images that have a data-image-guid tag
+                event.editor.dataProcessor.dataFilter.addRules({
+                    elements: {
+                        img: lang.hitch(this, function (element) {
+                            var guid = element.attributes["data-image-guid"];
+                            if (guid) {
+                                element.attributes.src = this._getFileUrl(guid);
+                            }
+                        })
+                    }
+                });
+
+                event.editor.dataProcessor.htmlFilter.addRules ({
+                    elements: {
+                        img: function (element) {
+                            var guid = element.attributes["data-image-guid"];
+                            if (guid) {
+                                element.attributes.src = "file?guid=" + guid;
+                            }
+                        }
+                    }
+                });
+
                 this._updateRendering(callback);
             }));
 
