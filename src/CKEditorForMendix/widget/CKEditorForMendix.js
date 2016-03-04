@@ -537,17 +537,25 @@ define([
         },
 
         retrieveImages: function (callback) {
-            this.retrieveImageObjects(function (objs) {
+            this.retrieveImageObjects(lang.hitch(this,function (objs) {
                 var images = [];
                 dojo.forEach(objs, function (obj, i) {
                     images.push({
                         guid: obj.getGuid(),
-                        thumbnailUrl: "file?guid=" + obj.getGuid() + "&thumb=true",
+                        thumbnailUrl: this._getFileUrl(obj.getGuid()) + "&thumb=true",
                         imageUrl:  "file?guid=" + obj.getGuid()
                     });
-                });
+                }, this);
                 callback(images);
-            });
+            }));
+        },
+
+        _getFileUrl: function (guid) {
+            var changedDate = Math.floor(Date.now() / 1); // Right now;
+            return mx.appUrl + "file?" + [
+                "guid=" + guid,
+                "changedDate=" + changedDate
+            ].join("&");
         },
 
 		retrieveImageObjects : function (callback, offset, search) {
