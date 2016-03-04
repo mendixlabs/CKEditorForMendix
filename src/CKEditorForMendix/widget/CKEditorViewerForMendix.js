@@ -48,10 +48,11 @@ define([
                 window.CKEditorViewer.data[this.id].microflowLinks = this.microflowLinks;
 
                 // Replace the html with the constant variables.
-
                 html = html.split("__LINK__").join("#" + name + "\" name=\"" + name + "\"");
                 html = html.split("__ID__").join(window.CKEditorViewer.base64.encode(this.id));
                 html = html.split("__GUID__").join(window.CKEditorViewer.base64.encode(this._contextObj.getGuid()));
+
+                html = html.replace(/(<img.*src=\")(file\?guid=)(\d+)(\".* \/>)/g, lang.hitch(this, this._replaceUrl));
 
                 $(this.domNode).html("");
                 $(this.domNode).append(html);
@@ -64,6 +65,20 @@ define([
                 logger.debug(this.id + "._updateRendering.callback");
                 callback();
             }
+        },
+
+        _replaceUrl: function (match, p1, p2, p3, p4, offset, string) {
+            // We will replace group 2 and 3 with an url created based on group 3
+            // See https://regexper.com/#%2F(%3Cimg.*src%3D%5C%22)(file%5C%3Fguid%3D)(%5Cd%2B)(%5C%22.*%20%5C%2F%3E)%2F
+            return p1 + this._getFileUrl(p3) + p4;
+        },
+
+        _getFileUrl: function (guid) {
+            var changedDate = Math.floor(Date.now() / 1); // Right now;
+            return mx.appUrl + "file?" + [
+                "guid=" + guid,
+                "changedDate=" + changedDate
+            ].join("&");
         },
 
         _resetSubscriptions: function () {

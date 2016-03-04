@@ -53,8 +53,10 @@
 				},
 
 				onUploaded: function( upload ) {
+                    console.log(upload.guid);
 					// Set width and height to prevent blinking.
 					this.replaceWith( '<img src="' + upload.url + '" ' +
+                        (upload.guid ? 'data-image-guid="' + upload.guid + '" ' : '') +
 						'width="' + this.parts.img.$.naturalWidth + '" ' +
 						'height="' + this.parts.img.$.naturalHeight + '">' );
 				}

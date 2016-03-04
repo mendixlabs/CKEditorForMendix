@@ -336,8 +336,10 @@ define([
                 this._settings[this.id].config.removePlugins = "simple-image-browser,uploadimage";
             } else {
                 this._settings[this.id].config.extraPlugins = this._getPlugins(true);
-                this._settings[this.id].config.removePlugins = "pastebase64"
+                this._settings[this.id].config.removePlugins = "pastebase64";
             }
+
+            this._settings[this.id].config.extraAllowedContent = "*[data-*]";
 
             // Create a CKEditor from HTML element.
             this._editor = this._CKEditor.replace("html_editor_" + this.id, this._settings[this.id].config);
@@ -355,8 +357,6 @@ define([
             this._editor.mendixWidgetConfig = {
                 microflowLinks: this.microflowLinks
             };
-
-            console.log(this._editor);
 
             this._setupEvents();
 
@@ -405,7 +405,8 @@ define([
                         },
                         callback: lang.hitch(this, function () {
                             logger.debug(this.id + "._fileUploadRequest uploaded");
-                            fileLoader.url = "file?target=internal&guid=" + guid;
+                            fileLoader.url = "file?guid=" + guid;
+                            fileLoader.guid = guid;
                             fileLoader.changeStatus("uploaded");
 
                             if (this.imageUploadMicroflow) {
@@ -540,8 +541,9 @@ define([
                 var images = [];
                 dojo.forEach(objs, function (obj, i) {
                     images.push({
-                        thumbnailUrl: "file?target=internal&guid=" + obj.getGuid() + "&thumb=true",
-                        imageUrl:  "file?target=internal&guid=" + obj.getGuid()
+                        guid: obj.getGuid(),
+                        thumbnailUrl: "file?guid=" + obj.getGuid() + "&thumb=true",
+                        imageUrl:  "file?guid=" + obj.getGuid()
                     });
                 });
                 callback(images);
