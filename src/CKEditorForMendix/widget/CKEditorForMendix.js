@@ -413,6 +413,7 @@ define([
                     var guid = obj.getGuid();
                     var upload = new Upload({
                         objectGuid: guid,
+                        maxFileSize: file.size,
                         startUpload: lang.hitch(this, function () {
                             logger.debug(this.id + "._fileUploadRequest uploading");
                             fileLoader.changeStatus("uploading");
