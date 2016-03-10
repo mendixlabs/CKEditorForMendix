@@ -1,7 +1,3 @@
-/*jslint white:true, nomen: true, plusplus: true */
-/*global logger */
-/*mendix */
-
 define([
     "dojo/_base/declare",
     "mxui/widget/_WidgetBase",
@@ -10,7 +6,7 @@ define([
     "dojo/_base/array",
     "dojo/_base/lang",
     "dojo/text",
-    "CKEditorForMendix/widget/lib/jquery-1.11.1",
+    "CKEditorForMendix/widget/lib/jquery",
     "CKEditorForMendix/widget/lib/ckeditor_viewer",
     "dojo/text!CKEditorForMendix/widget/templates/CKEditorViewerForMendix.html"
 ], function (declare, _WidgetBase, _TemplatedMixin, domStyle, dojoArray, lang, text, _jQuery, _CKEditorViewer, widgetTemplate) {
@@ -114,4 +110,8 @@ define([
         }
 
     });
+});
+
+require(["CKEditorForMendix/widget/CKEditorViewerForMendix"], function () {
+    "use strict";
 });

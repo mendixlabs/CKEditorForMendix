@@ -10,7 +10,7 @@ define([
         "dojo/_base/array",
         "dojo/_base/lang",
         "dojo/text",
-        "CKEditorForMendix/widget/lib/jquery-1.11.1",
+        "CKEditorForMendix/widget/lib/jquery",
         "CKEditorForMendix/widget/lib/ckeditor",
         "dojo/text!CKEditorForMendix/widget/templates/CKEditorForMendix.html",
         "CKEditorForMendix/widget/lib/jquery.oembed"
@@ -613,4 +613,8 @@ define([
             }
         }
     });
+});
+
+require(["CKEditorForMendix/widget/CKEditorForMendix"], function () {
+    "use strict";
 });
