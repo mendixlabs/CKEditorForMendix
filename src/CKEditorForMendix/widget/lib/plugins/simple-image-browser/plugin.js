@@ -59,8 +59,8 @@ CKEDITOR.plugins.add('simple-image-browser', {
                 $.each(images, function(key, value) {
                     var element = [
                          "<div onclick=\"CKEDITOR.tools.simpleimagebrowserinsertpicture('",
-                         value.imageUrl, "',", value.guid,
-                         ");\" style=\"position:relative;width:75px;height:75px;margin:5px;background-image:url('",
+                         value.imageUrl, "','", value.guid,
+                         "');\" style=\"position:relative;width:75px;height:75px;margin:5px;background-image:url('",
                          value.thumbnailUrl,
                          "');background-repeat:no-repeat;background-size:125%;background-position:center center;float:left;\"></div>"
                     ].join("");
@@ -83,7 +83,7 @@ CKEDITOR.plugins.add('simple-image-browser', {
           var dialog, html;
           editor = CKEDITOR.currentInstance;
           dialog = CKEDITOR.dialog.getCurrent();
-          html = '<img data-image-guid="' + guid + '" src="' + event + '" data-cke-saved-src="' + event + '" alt="image" />';
+          html = '<img data-image-guid="' + guid + '" src="file?guid=' + guid + '" alt="image" />';
           editor.config.allowedContent = true;
           editor.insertHtml(html.trim());
           dialog.hide();
