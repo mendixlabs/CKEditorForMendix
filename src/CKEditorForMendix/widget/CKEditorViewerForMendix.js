@@ -71,6 +71,9 @@ define([
 
         _getFileUrl: function (guid) {
             var changedDate = Math.floor(Date.now() / 1); // Right now;
+            if (mx.data.getDocumentUrl) {
+                return mx.data.getDocumentUrl(guid, changedDate, false);
+            }
             return mx.appUrl + "file?" + [
                 "guid=" + guid,
                 "changedDate=" + changedDate

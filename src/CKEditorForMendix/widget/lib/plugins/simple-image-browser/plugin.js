@@ -58,11 +58,11 @@ CKEDITOR.plugins.add('simple-image-browser', {
                 var txt = "";
                 $.each(images, function(key, value) {
                     var element = [
-                         "<div onclick=\"CKEDITOR.tools.simpleimagebrowserinsertpicture('",
-                         value.imageUrl, "','", value.guid,
-                         "');\" style=\"position:relative;width:75px;height:75px;margin:5px;background-image:url('",
+                         "<img src=\"",
                          value.thumbnailUrl,
-                         "');background-repeat:no-repeat;background-size:125%;background-position:center center;float:left;\"></div>"
+                         "\" onclick=\"CKEDITOR.tools.simpleimagebrowserinsertpicture('",
+                         value.imageUrl, "','", value.guid,
+                         "');\" style=\"position:relative;max-width:75px;max-height:75px;margin:5px;float:left;cursor:pointer;\" \\>"
                     ].join("");
                     txt = txt + element;
                  });

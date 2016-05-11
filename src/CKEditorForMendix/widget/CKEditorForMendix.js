@@ -425,6 +425,12 @@ define([
                         this._contextObj.addReference(this._imageReference, obj.getGuid());
                     }
 
+                    // Normalize file name and size (sometimes doesn't work in firefox)
+                    if (file.name === undefined && file.size === undefined) {
+                        file.name = file.fileName;
+                        file.size = file.fileSize;
+                    }
+
                     var guid = obj.getGuid();
                     var upload = new Upload({
                         objectGuid: guid,
@@ -592,6 +598,9 @@ define([
 
         _getFileUrl: function (guid) {
             var changedDate = Math.floor(Date.now() / 1); // Right now;
+            if (mx.data.getDocumentUrl) {
+                return mx.data.getDocumentUrl(guid, changedDate, false);
+            }
             return mx.appUrl + "file?" + [
                 "guid=" + guid,
                 "changedDate=" + changedDate
