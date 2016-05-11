@@ -42,6 +42,7 @@ define([
         _imageEntity: "",
         _imageReference: null,
         _setReference: false,
+        _sourceKeyHandle: null,
 
         ckeditorPlugins: [
             "divarea",
@@ -115,6 +116,7 @@ define([
 
         _setupEvents: function () {
             logger.debug(this.id + "._setupEvents");
+
             // On change event (== on keypress)
             this._editor.on("change", lang.hitch(this, function () {
                 this._editorChange(this._editor.getData());
@@ -145,7 +147,7 @@ define([
             //On blur (unselecting the textbox) event
             this._editor.on("blur", lang.hitch(this, function (e) {
                 this._focus = false;
-                if (this._editor.checkDirty() && this.onChangeMicroflow) {
+                if (this._editor.mode !== "source" && this._editor.checkDirty() && this.onChangeMicroflow) {
                     mx.data.action({
                         params: {
                             applyto: "selection",
@@ -161,6 +163,15 @@ define([
                     }, this);
                 }
 
+            }));
+
+            this._editor.on("mode", lang.hitch(this, function () {
+                var $textarea = $("textarea.cke_source", this.domNode);
+                if (this._editor.mode === "source" && $textarea.length) {
+                    $textarea.on("keyup", lang.hitch(this, function () {
+                        this._editor.fire("change");
+                    }));
+                }
             }));
         },
 
