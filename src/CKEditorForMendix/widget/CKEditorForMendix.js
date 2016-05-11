@@ -53,7 +53,8 @@ define([
             "uploadimage",
             "simple-image-browser",
             "pastebase64",
-            "wordcount"
+            "wordcount",
+            "maximize"
         ],
 
         // CKEditor instances.
