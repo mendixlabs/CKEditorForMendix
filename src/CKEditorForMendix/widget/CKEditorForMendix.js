@@ -52,7 +52,8 @@ define([
             "maximize",
             "uploadimage",
             "simple-image-browser",
-            "pastebase64"
+            "pastebase64",
+            "wordcount"
         ],
 
         // CKEditor instances.
@@ -183,7 +184,7 @@ define([
         },
 
         _editorChange: function (data) {
-            logger.debug(this.id + "._editorChange:", data);
+            logger.debug(this.id + "._editorChange:");
             if (this._contextObj !== null) {
                 this._contextObj.set(this.messageString, data);
             }
@@ -331,12 +332,26 @@ define([
             }
 
             this._settings[this.id].config.imageUploadUrl = "http://localhost/"; // not used
+            this._settings[this.id].config.extraPlugins = this._getPlugins();
+
             if (!this._useImageUpload) {
-                this._settings[this.id].config.extraPlugins = this._getPlugins(false);
                 this._settings[this.id].config.removePlugins = "simple-image-browser,uploadimage";
             } else {
-                this._settings[this.id].config.extraPlugins = this._getPlugins(true);
                 this._settings[this.id].config.removePlugins = "pastebase64";
+            }
+
+            if (!this.countPlugin) {
+                this._settings[this.id].config.removePlugins = "wordcount";
+            } else {
+                this._settings[this.id].config.wordcount = {
+                    showParagraphs: false,
+                    showWordCount: true,
+                    showCharCount: true,
+                    countSpacesAsChars: true,
+                    countHTML: true,
+                    maxWordCount: -1,
+                    maxCharCount: this.countPluginMaxCount > 0 ? this.countPluginMaxCount : -1
+                };
             }
 
             this._settings[this.id].config.extraAllowedContent = "*[data-*]";
@@ -615,6 +630,4 @@ define([
     });
 });
 
-require(["CKEditorForMendix/widget/CKEditorForMendix"], function () {
-    "use strict";
-});
+require(["CKEditorForMendix/widget/CKEditorForMendix"]);

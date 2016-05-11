@@ -188,5 +188,15 @@
 			<category>Images</category>
 			<description>This constraint might be used to filter the set of browsable images. (not functional right now)</description>
 		</property>
+        <property key="countPlugin" type="boolean" required="true" defaultValue="false">
+            <caption>Count plugin</caption>
+            <category>Count</category>
+            <description>Enable/disable wordcount plugin. This will have the ability to set a max amount of characters</description>
+        </property>
+        <property key="countPluginMaxCount" type="integer" required="true" defaultValue="0">
+			<caption>Maximum characters</caption>
+			<category>Count</category>
+			<description>If the Count plugin is enabled, specifiy the max amount of characters (including HTML). If you set this to 0, it will be unlimited.</description>
+		</property>
     </properties>
 </widget>
