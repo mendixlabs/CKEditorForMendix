@@ -41,17 +41,17 @@
 				fileLoader.xhr.open( 'POST', fileLoader.uploadUrl, true );
 			}, null, null, 5 );
 
-			editor.on( 'fileUploadRequest', function( evt ) {
-				var fileLoader = evt.data.fileLoader,
-					formData = new FormData();
-
-				formData.append( 'upload', fileLoader.file, fileLoader.fileName );
-
-				// Append token preventing CSRF attacks.
-				formData.append( 'ckCsrfToken', CKEDITOR.tools.getCsrfToken() );
-
-				fileLoader.xhr.send( formData );
-			}, null, null, 999 );
+			// editor.on( 'fileUploadRequest', function( evt ) {
+			// 	var fileLoader = evt.data.fileLoader,
+			// 		formData = new FormData();
+            //
+			// 	formData.append( 'upload', fileLoader.file, fileLoader.fileName );
+            //
+			// 	// Append token preventing CSRF attacks.
+			// 	formData.append( 'ckCsrfToken', CKEDITOR.tools.getCsrfToken() );
+            //
+			// 	fileLoader.xhr.send( formData );
+			// }, null, null, 999 );
 
 			/**
 			 * Event fired when the {CKEDITOR.fileTools.fileLoader file upload} response is received and needs to be parsed.

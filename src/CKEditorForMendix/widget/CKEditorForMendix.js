@@ -50,11 +50,6 @@ define([
             "tableresize",
             "oembed",
             "widget",
-            "maximize",
-            "uploadimage",
-            "simple-image-browser",
-            "pastebase64",
-            "wordcount",
             "maximize"
         ],
 
@@ -203,7 +198,28 @@ define([
         },
 
         _getPlugins: function (imageUpload) {
-            var plugins = this.ckeditorPlugins;
+            var plugins = [
+                "divarea",
+                "mendixlink",
+                "tableresize",
+                "oembed",
+                "widget",
+                "maximize"
+            ];
+
+            if (this._useImageUpload) {
+                plugins.push("uploadimage");
+                plugins.push("simple-image-browser");
+            } else {
+                plugins.push("pastebase64");
+            }
+
+            if (this.countPlugin) {
+                plugins.push("wordcount");
+            }
+
+            logger.debug(this.id + "._getPlugins: " + plugins.join(","));
+
             return plugins.join(",");
         },
 
@@ -346,15 +362,7 @@ define([
             this._settings[this.id].config.imageUploadUrl = "http://localhost/"; // not used
             this._settings[this.id].config.extraPlugins = this._getPlugins();
 
-            if (!this._useImageUpload) {
-                this._settings[this.id].config.removePlugins = "simple-image-browser,uploadimage";
-            } else {
-                this._settings[this.id].config.removePlugins = "pastebase64";
-            }
-
             if (!this.countPlugin) {
-                this._settings[this.id].config.removePlugins = "wordcount";
-            } else {
                 this._settings[this.id].config.wordcount = {
                     showParagraphs: false,
                     showWordCount: true,
@@ -419,7 +427,9 @@ define([
             if (this._useImageUpload) {
                 this._editor.on( "fileUploadRequest", lang.hitch(this, this._fileUploadRequest));
             } else {
-
+                this._editor.on( "fileUploadRequest", lang.hitch(this, function () {
+                    logger.warn(this.id + ": you are trying to upload an image, but file uploading has been switched off. Contact the administrator");
+                }));
             }
         },
 
