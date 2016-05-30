@@ -105,8 +105,13 @@ define([
 
             this._contextObj = obj;
 
-            this._resetSubscriptions();
-            this._updateRendering(callback);
+            if (obj && typeof obj.metaData === "undefined") {
+                logger.warn(this.id + ".update Error: CKeditor was configured for an entity the current user has no access to.");
+                mendix.lang.nullExec(callback);
+            } else {
+                this._resetSubscriptions();
+                this._updateRendering(callback);
+            }
         },
 
         _setupEvents: function () {
@@ -142,7 +147,7 @@ define([
             //On blur (unselecting the textbox) event
             this._editor.on("blur", lang.hitch(this, function (e) {
                 this._focus = false;
-                if (this._editor.mode !== "source" && this._editor.checkDirty() && this.onChangeMicroflow) {
+                if (this._editor.mode !== "source" && this._editor.checkDirty() && this.onChangeMicroflow && !this._strReadOnly()) {
                     mx.data.action({
                         params: {
                             applyto: "selection",
@@ -540,6 +545,10 @@ define([
             }
         },
 
+        _strReadOnly: function () {
+            return this._contextObj.isReadonlyAttr && this._contextObj.isReadonlyAttr(this.messageString);
+        },
+
         _updateRendering: function (callback) {
             logger.debug(this.id + "._updateRendering");
 
@@ -550,7 +559,10 @@ define([
                     domStyle.set(this.domNode, "visibility", "visible");
 
                     if (this._editor !== null) {
+
                         this._editor.setData(this._contextObj.get(this.messageString));
+                        this._editor.setReadOnly(this._strReadOnly());
+
                     } else {
                         logger.warn(this.id + " - Unable to add contents to editor, no _editor object available");
                     }

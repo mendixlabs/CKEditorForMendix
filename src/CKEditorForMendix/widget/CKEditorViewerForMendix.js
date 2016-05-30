@@ -27,8 +27,14 @@ define([
             logger.debug(this.id + ".update");
 
             this._contextObj = obj;
-            this._resetSubscriptions();
-            this._updateRendering(callback);
+
+            if (obj && typeof obj.metaData === "undefined") {
+                logger.warn(this.id + ".update Error: CKeditorViewer was configured for an entity the current user has no access to.");
+                mendix.lang.nullExec(callback);
+            } else {
+                this._resetSubscriptions();
+                this._updateRendering(callback);
+            }
         },
 
         _updateRendering: function (callback) {
