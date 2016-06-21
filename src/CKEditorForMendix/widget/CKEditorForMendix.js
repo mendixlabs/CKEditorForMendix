@@ -374,8 +374,6 @@ define([
             this._settings[this.id].config.imageUploadUrl = "http://localhost/"; // not used
             this._settings[this.id].config.extraPlugins = this._getPlugins();
 
-            console.log(this._settings);
-
             if (this.countPlugin) {
                 this._settings[this.id].config.wordcount = {
                     showParagraphs: false,
