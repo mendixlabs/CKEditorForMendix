@@ -256,6 +256,11 @@ define([
             // Maximize offset
             this._settings[this.id].config.maximizeOffset = this.maximizeOffset;
 
+            if (!this.showStatusBar) {
+                this._settings[this.id].config.removePlugins = "elementspath";
+                this._settings[this.id].config.resize_enabled = false;
+            }
+
             // Autogrow functionality of the editor.
             this._settings[this.id].config.autoGrow_minHeight = 300;
             this._settings[this.id].config.autoGrow_onStartup = true;

@@ -136,6 +136,26 @@
             <category>Appearance</category>
             <description>Height of the widget content area in pixels. 0 for default height.</description>
         </property>
+        <property key="showLabel" type="boolean" defaultValue="false">
+            <caption>Show Label</caption>
+            <category>Appearance</category>
+            <description>Show a label for the field.</description>
+        </property>
+        <property key="fieldCaption" type="translatableString" required="false" multiline="false">
+            <caption>Label Caption</caption>
+            <category>Appearance</category>
+            <description>Specify the caption to use for the label</description>
+        </property>
+        <property key="maximizeOffset" type="integer" required="true" defaultValue="0">
+            <caption>Maximize offset</caption>
+            <category>Appearance</category>
+            <description>Specify the pixel offset when maximizing the widget. Sometimes a Mendix app will contain a toolbar at the top that will overlap the maximized editor. Usually this is 50px.</description>
+        </property>
+        <property key="showStatusBar" type="boolean" defaultValue="true">
+            <caption>Show Status Bar</caption>
+            <category>Appearance</category>
+            <description>Show status bar (Bottom). Note: Make sure you disable the Count plugin (Count --> Count plugin), otherwise the status bar will still be shown. This will also disable resizing of the editor.</description>
+        </property>
         <property key="microflowLinks" type="object" isList="true" required="false">
             <caption>Microflow links</caption>
             <category>Microflow links</category>
@@ -148,21 +168,6 @@
                 </property>
             </properties>
         </property>
-    	<property key="showLabel" type="boolean" defaultValue="false">
-			<caption>Show Label</caption>
-			<category>Appearance</category>
-			<description>Show a label for the field.</description>
-		</property>
-		<property key="fieldCaption" type="translatableString" required="false" multiline="false">
-			<caption>Label Caption</caption>
-			<category>Appearance</category>
-			<description>Specify the caption to use for the label</description>
-		</property>
-        <property key="maximizeOffset" type="integer" required="true" defaultValue="0">
-			<caption>Maximize offset</caption>
-			<category>Appearance</category>
-			<description>Specify the pixel offset when maximizing the widget. Sometimes a Mendix app will contain a toolbar at the top that will overlap the maximized editor. Usually this is 50px.</description>
-		</property>
         <property key="imagePasteMode" type="enumeration" defaultValue="base64">
             <caption>Image Mode</caption>
             <category>Images</category>
@@ -173,30 +178,30 @@
             </enumerationValues>
         </property>
         <property key="imageentity" type="entity" required="false" isPath="optional" pathType="referenceSet">
-			<caption>Image Entity</caption>
-			<category>Images</category>
-			<description>When setting the Image mode to 'Upload', please set this Entity. This domain entity will be insertable as image. Should inherit from System.Image</description>
-		</property>
+            <caption>Image Entity</caption>
+            <category>Images</category>
+            <description>When setting the Image mode to 'Upload', please set this Entity. This domain entity will be insertable as image. Should inherit from System.Image</description>
+        </property>
         <property key="imageUploadMicroflow" type="microflow" required="false" entityProperty="imageentity">
             <caption> Image upload Microflow</caption>
             <category>Images</category>
             <description>Microflow which is triggered when the image is uploaded</description>
             <returnType type="Void" />
         </property>
-		<property key="imageconstraint" type="entityConstraint" entityProperty="imageentity" required="false">
-			<caption>XPath Constraint</caption>
-			<category>Images</category>
-			<description>This constraint might be used to filter the set of browsable images. (not functional right now)</description>
-		</property>
+        <property key="imageconstraint" type="entityConstraint" entityProperty="imageentity" required="false">
+            <caption>XPath Constraint</caption>
+            <category>Images</category>
+            <description>This constraint might be used to filter the set of browsable images. (not functional right now)</description>
+        </property>
         <property key="countPlugin" type="boolean" required="true" defaultValue="false">
             <caption>Count plugin</caption>
             <category>Count</category>
             <description>Enable/disable wordcount plugin. This will have the ability to set a max amount of characters</description>
         </property>
         <property key="countPluginMaxCount" type="integer" required="true" defaultValue="0">
-			<caption>Maximum characters</caption>
-			<category>Count</category>
-			<description>If the Count plugin is enabled, specifiy the max amount of characters (including HTML). If you set this to 0, it will be unlimited.</description>
-		</property>
+            <caption>Maximum characters</caption>
+            <category>Count</category>
+            <description>If the Count plugin is enabled, specifiy the max amount of characters (including HTML). If you set this to 0, it will be unlimited.</description>
+        </property>
     </properties>
 </widget>
