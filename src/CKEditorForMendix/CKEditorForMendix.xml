@@ -156,6 +156,11 @@
             <category>Appearance</category>
             <description>Show status bar (Bottom). Note: Make sure you disable the Count plugin (Count --> Count plugin), otherwise the status bar will still be shown. This will also disable resizing of the editor.</description>
         </property>
+        <property key="showToolbarCollapsed" type="boolean" defaultValue="false">
+            <caption>Collapse toolbar</caption>
+            <category>Appearance</category>
+            <description>If you enable this, the toolbar at the top of the editor will be collapsed by default. (The user can expand it by clicking the button at the topright corner)</description>
+        </property>
         <property key="microflowLinks" type="object" isList="true" required="false">
             <caption>Microflow links</caption>
             <category>Microflow links</category>

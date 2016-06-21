@@ -252,6 +252,7 @@ define([
 
             // Collapsable toolbar
             this._settings[this.id].config.toolbarCanCollapse = true;
+            this._settings[this.id].config.toolbarStartupExpanded = !this.showToolbarCollapsed;
 
             // Maximize offset
             this._settings[this.id].config.maximizeOffset = this.maximizeOffset;
@@ -362,6 +363,7 @@ define([
                 this._settings[this.id].config.toolbarGroups.push({
                     name: "tools"
                 });
+
             }
             if (this.toolbarOthers) {
                 this._settings[this.id].config.toolbarGroups.push({
@@ -371,6 +373,8 @@ define([
 
             this._settings[this.id].config.imageUploadUrl = "http://localhost/"; // not used
             this._settings[this.id].config.extraPlugins = this._getPlugins();
+
+            console.log(this._settings);
 
             if (this.countPlugin) {
                 this._settings[this.id].config.wordcount = {
