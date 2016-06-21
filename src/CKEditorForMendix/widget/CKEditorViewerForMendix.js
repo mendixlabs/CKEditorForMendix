@@ -58,6 +58,8 @@ define([
 
                 $(this.domNode).html("");
                 $(this.domNode).append(html);
+
+                this.microflowButtonsPreventDefault();
             }
             else {
                 domStyle.set(this.domNode, "display", "none");
@@ -67,6 +69,17 @@ define([
                 logger.debug(this.id + "._updateRendering.callback");
                 callback();
             }
+        },
+
+        microflowButtonsPreventDefault: function () {
+            logger.debug(this.id + ".microflowButtonsPreventDefault");
+
+            // Make sure only the onclick exec function is called
+            $("a.mx-microflow-link", this.domNode).each(function () {
+                $(this).on("click", function (e) {
+                    e.preventDefault();
+                });
+            });
         },
 
         _replaceUrl: function (match, p1, p2, p3, p4, offset, string) {
@@ -121,6 +134,4 @@ define([
     });
 });
 
-require(["CKEditorForMendix/widget/CKEditorViewerForMendix"], function () {
-    "use strict";
-});
+require(["CKEditorForMendix/widget/CKEditorViewerForMendix"]);
