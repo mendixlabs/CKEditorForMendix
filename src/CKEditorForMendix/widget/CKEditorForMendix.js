@@ -25,6 +25,12 @@ define([
         // Set by the Modeler
         imageUploadMicroflow: "",
 
+        /**
+         * Parameters configured in modeller
+         */
+        showTooltip: false,
+        tooltipCaption: "",
+
         // Internal values
         _contextGuid: null,
         _contextObj: null,
@@ -246,7 +252,8 @@ define([
             this._settings[this.id] = {
                 config: {
                     toolbarGroups: [],
-                    oembed_WrapperClass: "embededContent"
+                    oembed_WrapperClass: "embededContent",
+                    title: this.showTooltip && this.tooltipCaption.trim() !== "" ? this.tooltipCaption : false
                 }
             };
 
