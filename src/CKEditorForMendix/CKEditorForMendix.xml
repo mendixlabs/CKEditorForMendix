@@ -146,16 +146,6 @@
             <category>Appearance</category>
             <description>Specify the caption to use for the label</description>
         </property>
-        <property key="showTooltip" type="boolean" defaultValue="false">
-            <caption>Show Tooltip</caption>
-            <category>Appearance</category>
-            <description>Shows a tooltip on hovering over the content area</description>
-        </property>
-        <property key="tooltipCaption" type="translatableString" required="false" multiline="false">
-            <caption>Tooltip Caption</caption>
-            <category>Appearance</category>
-            <description>Text to show in the tooltip</description>
-        </property>
         <property key="maximizeOffset" type="integer" required="true" defaultValue="0">
             <caption>Maximize offset</caption>
             <category>Appearance</category>

@@ -26,10 +26,8 @@ define([
         imageUploadMicroflow: "",
 
         /**
-         * Parameters configured in modeller
+         * Parameters configured in modeler
          */
-        showTooltip: false,
-        tooltipCaption: "",
 
         // Internal values
         _contextGuid: null,
@@ -253,7 +251,6 @@ define([
                 config: {
                     toolbarGroups: [],
                     oembed_WrapperClass: "embededContent",
-                    title: this.showTooltip && this.tooltipCaption.trim() !== "" ? this.tooltipCaption : false
                 }
             };
 
