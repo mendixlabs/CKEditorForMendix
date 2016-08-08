@@ -3,10 +3,12 @@ define([
         "mxui/widget/_WidgetBase",
         "dijit/_TemplatedMixin",
         "mxui/dom",
+        "dojo/query",
         "dojo/dom-style",
         "dojo/dom-class",
         "dojo/dom-construct",
         "dojo/html",
+        "dojo/on",
         "dojo/_base/array",
         "dojo/_base/lang",
         "dojo/text",
@@ -14,7 +16,11 @@ define([
         "CKEditorForMendix/widget/lib/ckeditor",
         "dojo/text!CKEditorForMendix/widget/templates/CKEditorForMendix.html",
         "CKEditorForMendix/widget/lib/jquery.oembed"
-    ], function (declare, _WidgetBase, _TemplatedMixin, dom, domStyle, dojoClass, domConstruct, html, dojoArray, lang, text, _jQuery, _CKEditor, widgetTemplate) {
+    ], function (declare, _WidgetBase, _TemplatedMixin,
+                 dom, query, domStyle, dojoClass,
+                 domConstruct, html, dojoOn,
+                 dojoArray, lang, text,
+                 _jQuery, _CKEditor, widgetTemplate) {
     "use strict";
 
     var $ = _jQuery.noConflict(true),
@@ -22,8 +28,58 @@ define([
 
     return declare("CKEditorForMendix.widget.CKEditorForMendix", [_WidgetBase, _TemplatedMixin], {
 
-        // Set by the Modeler
+        templateString: widgetTemplate,
+        /**
+         * Parameters configured in modeler
+         */
+        // Data source
+        messageString: "",
+        onKeyPressMicroflow: "",
+        onChangeMicroflow: "",
+        // Behavior
+        enterMode: "P",
+        shiftEnterMode: "BR",
+        autoParagraph: true,
+        // Appearance
+        bodyCssClass: false,
+        width: 0,
+        height: 0,
+        showLabel: false,
+        fieldCaption: "",
+        maximizeOffset: 0,
+        showStatusBar: true,
+        showToolbarCollapsed: false,
+        // Microflow links
+        microflowLinks: null,
+        // Document
+        toolbarDocument: true,
+        toolbarClipboard: true,
+        toolbarEditing: true,
+        toolbarForms: true,
+        toolbarSeperator1: true,
+        toolbarBasicstyles: true,
+        toolbarParagraph: true,
+        toolbarLinks: true,
+        toolbarInsert: true,
+        toolbarSeperator2: true,
+        toolbarStyles: true,
+        toolbarColors: true,
+        toolbarTools: true,
+        toolbarOthers: true,
+        // Images
+        imageentity: null,
+        imageconstraint: null,
+        imagePasteMode: "base64",
         imageUploadMicroflow: "",
+        // Count
+        countPlugin: false,
+        countPluginMaxCount: 0,
+
+        /**
+         * Configured in the template
+         */
+        ckEditorLabelNode: null,
+        CKEditorForMendixNode: null,
 
         // Internal values
         _contextGuid: null,
@@ -55,16 +111,31 @@ define([
 
         // CKEditor instances.
         _settings: null,
-
-        templateString: widgetTemplate,
-
+        /**
+         * Called after constructing the widget. Implement to do extra setup work.
+         */
         postCreate: function () {
             logger.debug(this.id + ".postCreate");
 
             this._CKEditor = window.CKEDITOR;
             this._CKEditor.jQuery = $;
-            this._CKEditor.getImages = lang.hitch(this, this.retrieveImages);
+            // As far as I can tell, the code below and all associate functions are not being used.
+            this._CKEditor.getImages = lang.hitch(this, this.retrieveImages); // Sets a reference of the retrieveImages function to the getImages property
 
+            this._setImagePaths();
+            this._showLabel();
+
+            if (this.readOnly || this.get("disabled") || this.readonly) { // Not sure where it's getting the readOnly property. Couldn't find it in the console
+                this._isReadOnly = true;
+            }
+
+        },
+
+        /**
+         * Sets the Image Entity and Reference if configured in the modeler
+         */
+        _setImagePaths: function () {
+            logger.debug(this.id + "._setImagePaths");
             if (this.imageentity) {
                 var split = this.imageentity.split("/");
                 if (split.length === 1) {
@@ -74,32 +145,33 @@ define([
                     this._imageReference = split[0];
                     this._setReference = true;
                 }
-            }
-
-            if( this.showLabel ) {
-                if (dojoClass.contains(this.ckEditorLabel, "hidden")) {
-                    dojoClass.remove(this.ckEditorLabel, "hidden");
-                }
-                this.ckEditorLabel.innerHTML = this.fieldCaption;
-            } else {
-                if (!dojoClass.contains(this.ckEditorLabel, "hidden")) {
-                    dojoClass.add(this.ckEditorLabel, "hidden");
-                }
-            }
-
-            if (this.readOnly || this.get("disabled") || this.readonly) {
-                this._isReadOnly = true;
-            }
-
-            if (this.imagePasteMode === "upload") {
-                if (this.imageentity) {
+                if (this.imagePasteMode === "upload") {
                     this._useImageUpload = true;
-                } else {
-                    console.warn(this.id + " you have set the Image mode to 'upload', but you have not set the entity yet");
                 }
             }
         },
-
+        /**
+         * Check if user wants to show label and has set the caption then shows the label.
+         * Caption is also configured in modeler.
+         */
+        _showLabel: function () {
+            logger.debug(this.id + "._showLabel");
+            if( this.showLabel && this.fieldCaption.trim() !== "") {
+                if (dojoClass.contains(this.ckEditorLabelNode, "hidden")) {
+                    dojoClass.remove(this.ckEditorLabelNode, "hidden");
+                }
+                html.set(this.ckEditorLabelNode, this.fieldCaption);
+            } else {
+                if (!dojoClass.contains(this.ckEditorLabelNode, "hidden")) {
+                    dojoClass.add(this.ckEditorLabelNode, "hidden");
+                }
+            }
+        },
+        /**
+         * Called when context is changed or initialized. Implement to re-render and / or fetch data
+         * @param obj
+         * @param callback
+         */
         update: function (obj, callback) {
             logger.debug(this.id + ".update");
 
@@ -113,30 +185,20 @@ define([
                 this._updateRendering(callback);
             }
         },
-
-        _setupEvents: function () {
+        /**
+         * Attach events to HTML dom elements
+         * @param callback
+         * @private
+         */
+        _setupEvents: function (callback) {
             logger.debug(this.id + "._setupEvents");
 
             // On change event (== on keypress)
             this._editor.on("change", lang.hitch(this, function () {
-                this._editorChange(this._editor.getData());
+                this._updateContextData(this._editor.getData());
 
                 if (this.onKeyPressMicroflow) {
-                    mx.data.action({
-                        params: {
-                            applyto: "selection",
-                            actionname: this.onKeyPressMicroflow,
-                            guids: [this._contextObj.getGuid()]
-                        },
-                        store: {
-                            caller: this.mxform
-                        },
-                        callback: function (obj) {
-                        },
-                        error: function (error) {
-                            console.log(this.id + ": An error occurred while executing microflow: " + error.description);
-                        }
-                    }, this);
+                    this._executeMf(this._contextObj, this.onKeyPressMicroflow);
                 }
             }));
 
@@ -148,33 +210,35 @@ define([
             this._editor.on("blur", lang.hitch(this, function (e) {
                 this._focus = false;
                 if (this._editor.mode !== "source" && this._editor.checkDirty() && this.onChangeMicroflow && !this._strReadOnly()) {
-                    mx.data.action({
-                        params: {
-                            applyto: "selection",
-                            actionname: this.onChangeMicroflow,
-                            guids: [this._contextObj.getGuid()]
-                        },
-                        callback: lang.hitch(this, function (obj) {
-                            this._editor.resetDirty();
-                        }),
-                        error: lang.hitch(this, function (error) {
-                            console.log(this.id + ": An error occurred while executing microflow: " + error.description);
-                        })
-                    }, this);
+                    this._executeMf(this._contextObj, this.onChangeMicroflow, this._editor.resetDirty());
                 }
 
             }));
 
             this._editor.on("mode", lang.hitch(this, function () {
-                var $textarea = $("textarea.cke_source", this.domNode);
-                if (this._editor.mode === "source" && $textarea.length) {
-                    $textarea.on("keyup", lang.hitch(this, function () {
+                var textarea = query("textarea.cke_source", this.domNode);
+                if (this._editor.mode === "source" && textarea.length > 0) {
+                    this.own(dojoOn(textarea[0], "keyup", lang.hitch(this, function () {
                         this._editor.fire("change");
-                    }));
+                    })));
                 }
             }));
-        },
 
+            this._editor.on("instanceReady", lang.hitch(this, function(event) {
+                logger.debug(this.id + "._createChildNodes editor ready! Calling _updateRendering");
+                this._addDataProcessorFilters();
+                this._updateRendering(callback);
+            }));
+
+            this._editor.on( "fileUploadRequest", lang.hitch(this, this._fileUploadRequest));
+        },
+        /**
+         * Executes a microflow mf, passes in obj and then executes callback on success
+         * @param obj
+         * @param mf
+         * @param callback
+         * @private
+         */
         _executeMf: function (obj, mf, callback) {
             logger.debug(this.id + "._executeMf: ", mf);
             if (obj && mf !== "") {
@@ -194,8 +258,12 @@ define([
                 }, this);
             }
         },
-
-        _editorChange: function (data) {
+        /**
+         * Updates Context Object variable attached to Editor with the current editor content
+         * @param data
+         * @private
+         */
+        _updateContextData: function (data) {
             logger.debug(this.id + "._editorChange:");
             if (this._contextObj !== null) {
                 this._contextObj.set(this.messageString, data);
@@ -227,153 +295,176 @@ define([
 
             return plugins.join(",");
         },
+        /**
+         * Represents a data processor which is responsible for
+         * translating and transforming the editor data on input and output.
+         * @param callback
+         * @private
+         */
+        _addDataProcessorFilters: function () {
+            // Add filters for images that have a data-image-guid tag
+            event.editor.dataProcessor.dataFilter.addRules({
+                elements: {
+                    img: lang.hitch(this, function (element) {
+                        var guid = element.attributes["data-image-guid"];
+                        if (guid) {
+                            element.attributes.src = this._getFileUrl(guid);
+                        }
+                    })
+                }
+            });
 
-        // Create child nodes.
+            event.editor.dataProcessor.htmlFilter.addRules ({
+                elements: {
+                    img: function (element) {
+                        var guid = element.attributes["data-image-guid"];
+                        if (guid) {
+                            element.attributes.src = "file?guid=" + guid;
+                        }
+                    }
+                }
+            });
+
+        },
+        /**
+         * Creates and configures an instance of the Editor
+         * @param callback
+         * @private
+         */
         _createChildNodes: function (callback) {
             logger.debug(this.id + "._createChildNodes");
-            this.CKEditorForMendixNode.appendChild(dom.create("textarea", {
+            var textAreaNode = dom.create("textarea", {
                 "name": "html_editor_" + this.id,
                 "id": "html_editor_" + this.id,
                 "rows": "10",
                 "cols": "80"
-            }));
+            });
+            domConstruct.place(textAreaNode, this.CKEditorForMendixNode);
 
-            var seperator1 = null,
-                seperator2 = null;
+            this._configureEditor();
 
+            // Create a CKEditor from HTML element.
+            this._editor = this._CKEditor.replace("html_editor_" + this.id, this._settings[this.id].config);
+            // More Configs
+            this._editor.config.enterMode = this._CKEditor["ENTER_" + this.enterMode];
+            this._editor.config.shiftEnterMode = this._CKEditor["ENTER_" + this.shiftEnterMode];
+            this._editor.config.autoParagraph  = this.autoParagraph;
+            // Attach Mendix Widget & Widget configuration to the CKEditor.
+            this._editor.mendixWidget = this;
+            this._editor.mendixWidgetID = this.id;
+            this._editor.mendixWidgetConfig = {
+                microflowLinks: this.microflowLinks
+            };
+
+            this._setupEvents(callback);
+
+        },
+        /**
+         * Defines the specific settings for the CKEditor based on widget configurations
+         * in the modeler
+         * @private
+         */
+        _configureEditor: function () {
+            logger.debug(this.id + " _configureEditor");
             // Create new config
             this._settings = [];
+            // Object index in the array is based on widget ID because CKEditor
+            // object is global and this is required to create unique settings
+            // for multiple widget instances
             this._settings[this.id] = {
                 config: {
                     toolbarGroups: [],
-                    oembed_WrapperClass: "embededContent"
+                    oembed_WrapperClass: "embededContent",
+                    toolbarCanCollapse: true,
+                    toolbarStartupExpanded: !this. showToolbarCollapsed,
+                    maximizeOffset: this.maximizeOffset,
+                    autoGrow_minHeight: 300,
+                    autoGrow_onStartup: true,
+                    baseHref: mx.appUrl,
+                    imageUploadUrl: "http://localhost/", // not used
+                    extraPlugins: this._getPlugins(),
+                    removePlugins: this.showStatusBar ? "elementspath" : "",
+                    resize_enabled: !this.showStatusBar,
+                    width: this.width > 0 ? this.width : "",
+                    height: this.height > 0 ? this.height : 200,
+                    bodyClass: this.bodyCssClass,
+                    extraAllowedContent: "*[data-*]"
                 }
             };
 
-            // Collapsable toolbar
-            this._settings[this.id].config.toolbarCanCollapse = true;
-            this._settings[this.id].config.toolbarStartupExpanded = !this.showToolbarCollapsed;
-
-            // Maximize offset
-            this._settings[this.id].config.maximizeOffset = this.maximizeOffset;
-
-            if (!this.showStatusBar) {
-                this._settings[this.id].config.removePlugins = "elementspath";
-                this._settings[this.id].config.resize_enabled = false;
-            }
-
-            // Autogrow functionality of the editor.
-            this._settings[this.id].config.autoGrow_minHeight = 300;
-            this._settings[this.id].config.autoGrow_onStartup = true;
-            if (this.width > 0) {
-                this._settings[this.id].config.width = this.width;
-            }
-            if (this.height > 0) {
-                this._settings[this.id].config.height = this.height;
-            }
-
-
-            // Base URL inside CKEditor
-            this._settings[this.id].config.baseHref = mx.appUrl;
-
-            // CSS class
-            if (this.bodyCssClass !== "") {
-                this._settings[this.id].config.bodyClass = this.bodyCssClass;
-            }
-
-            seperator1 = false;
-            seperator2 = false;
-
             this._CKEditor.config.toolbarGroups = [];
+            this._addToolbarGroups();
+            this._addWordCountPlugin();
 
-            if (this.toolbarDocument) {
-                this._settings[this.id].config.toolbarGroups.push({
-                    name: "document",
-                    groups: ["mode", "document", "doctools"]
-                });
-                seperator1 = true;
-            }
-            if (this.toolbarClipboard) {
-                this._settings[this.id].config.toolbarGroups.push({
-                    name: "clipboard",
-                    groups: ["clipboard", "undo"]
-                });
-                seperator1 = true;
-            }
-            if (this.toolbarEditing) {
-                this._settings[this.id].config.toolbarGroups.push({
-                    name: "editing",
-                    groups: ["find", "selection", "spellchecker"]
-                });
-                seperator1 = true;
-            }
-            if (this.toolbarForms) {
-                this._settings[this.id].config.toolbarGroups.push({
-                    name: "forms"
-                });
-                seperator1 = true;
-            }
+        },
+        /**
+         * Creates ToolbarGroups on Editor
+         * If the toolbar layout is not explicitly defined by the toolbar setting,
+         * then this setting is used to group all defined buttons.
+         * @private
+         */
+        _addToolbarGroups: function () {
+            this._addToolbarGroup(this.toolbarDocument, {
+                name: "document",
+                groups: ["mode", "document", "doctools"]
+            });
+            this._addToolbarGroup(this.toolbarClipboard, {
+                name: "clipboard",
+                groups: ["clipboard", "undo"]
+            });
+            this._addToolbarGroup(this.toolbarEditing, {
+                name: "editing",
+                groups: ["find", "selection", "spellchecker"]
+            });
+            this._addToolbarGroup(this.toolbarForms, {
+                name: "forms"
+            });
+            this._addToolbarGroup(this.toolbarSeperator1, "/");
+            this._addToolbarGroup(this.toolbarBasicstyles, {
+                name: "basicstyles",
+                groups: ["basicstyles", "cleanup"]
+            });
+            this._addToolbarGroup(this.toolbarParagraph, {
+                name: "paragraph",
+                groups: ["list", "indent", "blocks", "align", "bidi"]
+            });
+            this._addToolbarGroup(this.toolbarLinks, {
+                name: "links"
+            });
+            this._addToolbarGroup(this.toolbarInsert, {
+                name: "insert"
+            });
+            this._addToolbarGroup(this.toolbarSeperator2, "/");
 
-            if (this.toolbarSeperator1) {
-                this._settings[this.id].config.toolbarGroups.push("/");
+            this._addToolbarGroup(this.toolbarStyles, {
+                name: "styles"
+            });
+            this._addToolbarGroup(this.toolbarColors, {
+                name: "colors"
+            });
+            this._addToolbarGroup(this.toolbarTools, {
+                name: "tools"
+            });
+            this._addToolbarGroup(this.toolbarOthers, {
+                name: "others"
+            });
+        },
+        /**
+         * Adds a single toolbar group to the editor.
+         * @param add
+         * @param toolbarOptions
+         * @private
+         */
+        _addToolbarGroup: function(add, toolbarOptions) {
+            if(add && toolbarOptions) {
+                this._settings[this.id].config.toolbarGroups.push(toolbarOptions);
             }
-
-            if (this.toolbarBasicstyles) {
-                this._settings[this.id].config.toolbarGroups.push({
-                    name: "basicstyles",
-                    groups: ["basicstyles", "cleanup"]
-                });
-                seperator2 = true;
-            }
-            if (this.toolbarParagraph) {
-                this._settings[this.id].config.toolbarGroups.push({
-                    name: "paragraph",
-                    groups: ["list", "indent", "blocks", "align", "bidi"]
-                });
-                seperator2 = true;
-            }
-            if (this.toolbarLinks) {
-                this._settings[this.id].config.toolbarGroups.push({
-                    name: "links"
-                });
-                seperator2 = true;
-            }
-            if (this.toolbarInsert) {
-                this._settings[this.id].config.toolbarGroups.push({
-                    name: "insert"
-                });
-                seperator2 = true;
-            }
-
-            if (this.toolbarSeperator2) {
-                this._settings[this.id].config.toolbarGroups.push("/");
-            }
-
-            if (this.toolbarStyles) {
-                this._settings[this.id].config.toolbarGroups.push({
-                    name: "styles"
-                });
-            }
-            if (this.toolbarColors) {
-                this._settings[this.id].config.toolbarGroups.push({
-                    name: "colors"
-                });
-            }
-            if (this.toolbarTools) {
-                this._settings[this.id].config.toolbarGroups.push({
-                    name: "tools"
-                });
-
-            }
-            if (this.toolbarOthers) {
-                this._settings[this.id].config.toolbarGroups.push({
-                    name: "others"
-                });
-            }
-
-            this._settings[this.id].config.imageUploadUrl = "http://localhost/"; // not used
-            this._settings[this.id].config.extraPlugins = this._getPlugins();
-
+        },
+        /**
+         * Adds the CKEditor Word count plugin that tracks & limits number of words used in the editor
+         * @private
+         */
+        _addWordCountPlugin: function () {
             if (this.countPlugin) {
                 this._settings[this.id].config.wordcount = {
                     showParagraphs: false,
@@ -385,133 +476,85 @@ define([
                     maxCharCount: this.countPluginMaxCount > 0 ? this.countPluginMaxCount : -1
                 };
             }
-
-            this._settings[this.id].config.extraAllowedContent = "*[data-*]";
-
-            // Create a CKEditor from HTML element.
-            this._editor = this._CKEditor.replace("html_editor_" + this.id, this._settings[this.id].config);
-
-            // Set enterMode
-            this._editor.config.enterMode = this._CKEditor["ENTER_" + this.enterMode];
-            this._editor.config.shiftEnterMode = this._CKEditor["ENTER_" + this.shiftEnterMode];
-
-            // Set autoparagraph
-            this._editor.config.autoParagraph  = this.autoParagraph;
-
-            // Attach Mendix Widget to editor and pass the mendix widget configuration to the CKEditor.
-            this._editor.mendixWidget = this;
-            this._editor.mendixWidgetID = this.id;
-            this._editor.mendixWidgetConfig = {
-                microflowLinks: this.microflowLinks
-            };
-
-            this._setupEvents();
-
-            this._editor.on("instanceReady", lang.hitch(this, function(event) {
-                logger.debug(this.id + "._createChildNodes editor ready, total height: " + $("#" + this.id).height() + ", calling _updateRendering");
-
-                // Add filters for images that have a data-image-guid tag
-                event.editor.dataProcessor.dataFilter.addRules({
-                    elements: {
-                        img: lang.hitch(this, function (element) {
-                            var guid = element.attributes["data-image-guid"];
-                            if (guid) {
-                                element.attributes.src = this._getFileUrl(guid);
-                            }
-                        })
-                    }
-                });
-
-                event.editor.dataProcessor.htmlFilter.addRules ({
-                    elements: {
-                        img: function (element) {
-                            var guid = element.attributes["data-image-guid"];
-                            if (guid) {
-                                element.attributes.src = "file?guid=" + guid;
-                            }
-                        }
-                    }
-                });
-
-                this._updateRendering(callback);
-            }));
-
-            if (this._useImageUpload) {
-                this._editor.on( "fileUploadRequest", lang.hitch(this, this._fileUploadRequest));
-            } else {
-                this._editor.on( "fileUploadRequest", lang.hitch(this, function () {
-                    logger.warn(this.id + ": you are trying to upload an image, but file uploading has been switched off. Contact the administrator");
-                }));
-            }
         },
-
+        /**
+         * Handles file upload requests from the Editor
+         * @param evt
+         * @private
+         */
         _fileUploadRequest: function (evt) {
             logger.debug(this.id + "._fileUploadRequest");
-            var fileLoader = evt.data.fileLoader,
-                file = fileLoader.file;
+            if (this._useImageUpload) {
+                var fileLoader = evt.data.fileLoader,
+                    file = fileLoader.file;
 
-            mx.data.create({
-                entity: this._imageEntity,
-                callback: lang.hitch(this, function (obj) {
-                    logger.debug(this.id + "._fileUploadRequest Image entity created");
+                mx.data.create({
+                    entity: this._imageEntity,
+                    callback: lang.hitch(this, function (obj) {
+                        logger.debug(this.id + "._fileUploadRequest Image entity created");
 
-                    if (this._setReference && this._imageReference) {
-                        this._contextObj.addReference(this._imageReference, obj.getGuid());
-                    }
+                        if (this._setReference && this._imageReference) {
+                            this._contextObj.addReference(this._imageReference, obj.getGuid());
+                        }
 
-                    // Normalize file name and size (sometimes doesn't work in firefox)
-                    if (file.name === undefined && file.size === undefined) {
-                        file.name = file.fileName;
-                        file.size = file.fileSize;
-                    }
+                        // Normalize file name and size (sometimes doesn't work in firefox)
+                        if (file.name === undefined && file.size === undefined) {
+                            file.name = file.fileName;
+                            file.size = file.fileSize;
+                        }
 
-                    var guid = obj.getGuid();
-                    var upload = new Upload({
-                        objectGuid: guid,
-                        maxFileSize: file.size,
-                        startUpload: lang.hitch(this, function () {
-                            logger.debug(this.id + "._fileUploadRequest uploading");
-                            fileLoader.changeStatus("uploading");
-                        }),
-                        finishUpload: lang.hitch(this, function () {
-                            logger.debug(this.id + "._fileUploadRequest finished uploading");
-                        }),
-                        form: {
-                            mxdocument: {
-                                files: [
-                                    file
-                                ]
-                            }
-                        },
-                        callback: lang.hitch(this, function () {
-                            logger.debug(this.id + "._fileUploadRequest uploaded");
-                            fileLoader.url = "file?guid=" + guid;
-                            fileLoader.guid = guid;
-                            fileLoader.changeStatus("uploaded");
+                        var guid = obj.getGuid();
+                        var upload = new Upload({
+                            objectGuid: guid,
+                            maxFileSize: file.size,
+                            startUpload: lang.hitch(this, function () {
+                                logger.debug(this.id + "._fileUploadRequest uploading");
+                                fileLoader.changeStatus("uploading");
+                            }),
+                            finishUpload: lang.hitch(this, function () {
+                                logger.debug(this.id + "._fileUploadRequest finished uploading");
+                            }),
+                            form: {
+                                mxdocument: {
+                                    files: [
+                                        file
+                                    ]
+                                }
+                            },
+                            callback: lang.hitch(this, function () {
+                                logger.debug(this.id + "._fileUploadRequest uploaded");
+                                fileLoader.url = "file?guid=" + guid;
+                                fileLoader.guid = guid;
+                                fileLoader.changeStatus("uploaded");
 
-                            if (this.imageUploadMicroflow) {
-                                this._executeMf(obj, this.imageUploadMicroflow);
-                            }
+                                if (this.imageUploadMicroflow) {
+                                    this._executeMf(obj, this.imageUploadMicroflow);
+                                }
 
-                            this._editor.fire("change");
-                        }),
-                        error: lang.hitch(this, function (err) {
-                            console.error(this.id + "._fileUploadRequest error uploading", arguments);
-                            fileLoader.message = "Error uploading: " + err.toString();
-                            fileLoader.changeStatus("error");
-                        })
-                    });
+                                this._editor.fire("change");
+                            }),
+                            error: lang.hitch(this, function (err) {
+                                console.error(this.id + "._fileUploadRequest error uploading", arguments);
+                                fileLoader.message = "Error uploading: " + err.toString();
+                                fileLoader.changeStatus("error");
+                            })
+                        });
 
-                    upload.upload();
-                }),
-                error: lang.hitch(this, function (err) {
-                    logger.debug(this.id + "._fileUploadRequest Image entity failed to create");
-                    fileLoader.message = "Error uploading: " + err.toString();
-                    fileLoader.changeStatus("error");
-                }),
-                scope: this._contextObj
-            });
-            evt.stop();
+                        upload.upload();
+                    }),
+                    error: lang.hitch(this, function (err) {
+                        logger.debug(this.id + "._fileUploadRequest Image entity failed to create");
+                        fileLoader.message = "Error uploading: " + err.toString();
+                        fileLoader.changeStatus("error");
+                    }),
+                    scope: this._contextObj
+                });
+                evt.stop();
+            } else {
+                this._editor.on( "fileUploadRequest", lang.hitch(this, function () {
+                    logger.warn(this.id + ": File Upload is disabled in widget settings!");
+                }));
+            }
         },
 
         _handleValidation: function (validations) {
@@ -535,7 +578,11 @@ define([
             logger.debug(this.id + "._clearValidations");
             domConstruct.destroy(this._alertdiv);
         },
-
+        /**
+         * Add a validation...
+         * @param msg
+         * @private
+         */
         _addValidation: function (msg) {
             logger.debug(this.id + "._addValidation");
             this._alertdiv = domConstruct.create("div", {
@@ -546,16 +593,19 @@ define([
             this.CKEditorForMendixNode.appendChild(this._alertdiv);
         },
 
-        _updateAttrRendering: function () {
-            if (!this._focus) {
-                this._updateRendering();
-            }
-        },
-
+        /**
+         * Checks and returns readOnly status
+         * @returns {*}
+         * @private
+         */
         _strReadOnly: function () {
             return this._contextObj.isReadonlyAttr && this._contextObj.isReadonlyAttr(this.messageString);
         },
-
+        /**
+         * Rerender the widget interface.
+         * @param callback
+         * @private
+         */
         _updateRendering: function (callback) {
             logger.debug(this.id + "._updateRendering");
 
@@ -564,26 +614,25 @@ define([
             } else {
                 if (this._contextObj) {
                     domStyle.set(this.domNode, "visibility", "visible");
-
-                    if (this._editor !== null) {
-
-                        this._editor.setData(this._contextObj.get(this.messageString));
-                        this._editor.setReadOnly(this._strReadOnly());
-
-                    } else {
-                        logger.warn(this.id + " - Unable to add contents to editor, no _editor object available");
-                    }
+                    this._populateEditor();
                 } else {
                     domStyle.set(this.domNode, "visibility", "hidden");
                 }
-
-                if (callback && typeof callback === "function") {
-                    logger.debug(this.id + "._updateRendering.callback");
-                    callback();
-                }
+                mendix.lang.nullExec(callback);
             }
         },
-
+        /**
+         * Add data to Editor and setReadOnly status
+         * @private
+         */
+        _populateEditor: function () {
+            if (this._editor !== null) {
+                this._editor.setData(this._contextObj.get(this.messageString));
+                this._editor.setReadOnly(this._strReadOnly());
+            } else {
+                logger.warn(this.id + " - Unable to add contents to editor: No _editor object available");
+            }
+        },
         _resetSubscriptions: function () {
             logger.debug(this.id + "._resetSubscriptions");
             var objHandle = null,
@@ -609,7 +658,9 @@ define([
                     guid: this._contextObj.getGuid(),
                     attr: this.messageString,
                     callback: lang.hitch(this,function(guid,attr,attrValue) {
-                        this._updateAttrRendering();
+                        if (!this._focus) {
+                            this._updateRendering();
+                        }
                     })
                 });
 
@@ -624,22 +675,23 @@ define([
         },
 
         retrieveImages: function (callback) {
+            // inline callback for retrieveImageObjects function
             this.retrieveImageObjects(lang.hitch(this,function (objs) {
                 var images = [];
-                dojo.forEach(objs, function (obj, i) {
+                dojo.forEach(objs, function (obj, i) { // deprecated usage of dojo.forEach... Use dojo/_base/array instead
                     images.push({
                         guid: obj.getGuid(),
                         thumbnailUrl: this._getFileUrl(obj.getGuid()) + "&thumb=true",
                         imageUrl:  "file?guid=" + obj.getGuid()
                     });
                 }, this);
-                callback(images);
+                callback(images);// Should check if callback is a function before calling it
             }));
         },
 
         _getFileUrl: function (guid) {
-            var changedDate = Math.floor(Date.now() / 1); // Right now;
-            if (mx.data.getDocumentUrl) {
+            var changedDate = Math.floor(Date.now() / 1); // Right now; ED?? Why divide by 1??
+            if (mx.data.getDocumentUrl) { // Couldn't find this function in API docs
                 return mx.data.getDocumentUrl(guid, changedDate, false);
             }
             return mx.appUrl + "file?" + [
@@ -669,7 +721,9 @@ define([
 			}
 			return "";
 		},
-
+        /**
+         * Called when the widget is destroyed. Implement to do special tear-down work.
+         */
         uninitialize: function () {
             logger.debug(this.id + ".uninitialize");
             if (this._editor) {
