@@ -1,0 +1,12 @@
+#.cpd.yaml
+languages:
+  - javascript
+files:
+  - "**/*.js"
+exclude:
+  - "**/*.min.js"
+  - "**/*.mm.js"
+  - "**/node_modules/**"
+  - "**/test/**"
+  - "**/lib/**"
+reporter: json
