@@ -397,6 +397,9 @@ define([
 
             // Set autoparagraph
             this._editor.config.autoParagraph  = this.autoParagraph;
+			
+			// Set spellchecker
+			this._editor.config.disableNativeSpellChecker = !this.enableSpellCheck; // Enable or disable spellchecking
 
             // Attach Mendix Widget to editor and pass the mendix widget configuration to the CKEditor.
             this._editor.mendixWidget = this;
