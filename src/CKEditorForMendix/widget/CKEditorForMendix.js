@@ -24,6 +24,7 @@ define([
 
         // Set by the Modeler
         imageUploadMicroflow: "",
+        //customToolbars: [],
 
         // Internal values
         _contextGuid: null,
@@ -238,9 +239,6 @@ define([
                 "cols": "80"
             }));
 
-            var seperator1 = null,
-                seperator2 = null;
-
             // Create new config
             this._settings = [];
             this._settings[this.id] = {
@@ -281,95 +279,9 @@ define([
                 this._settings[this.id].config.bodyClass = this.bodyCssClass;
             }
 
-            seperator1 = false;
-            seperator2 = false;
-
             this._CKEditor.config.toolbarGroups = [];
 
-            if (this.toolbarDocument) {
-                this._settings[this.id].config.toolbarGroups.push({
-                    name: "document",
-                    groups: ["mode", "document", "doctools"]
-                });
-                seperator1 = true;
-            }
-            if (this.toolbarClipboard) {
-                this._settings[this.id].config.toolbarGroups.push({
-                    name: "clipboard",
-                    groups: ["clipboard", "undo"]
-                });
-                seperator1 = true;
-            }
-            if (this.toolbarEditing) {
-                this._settings[this.id].config.toolbarGroups.push({
-                    name: "editing",
-                    groups: ["find", "selection", "spellchecker"]
-                });
-                seperator1 = true;
-            }
-            if (this.toolbarForms) {
-                this._settings[this.id].config.toolbarGroups.push({
-                    name: "forms"
-                });
-                seperator1 = true;
-            }
-
-            if (this.toolbarSeperator1) {
-                this._settings[this.id].config.toolbarGroups.push("/");
-            }
-
-            if (this.toolbarBasicstyles) {
-                this._settings[this.id].config.toolbarGroups.push({
-                    name: "basicstyles",
-                    groups: ["basicstyles", "cleanup"]
-                });
-                seperator2 = true;
-            }
-            if (this.toolbarParagraph) {
-                this._settings[this.id].config.toolbarGroups.push({
-                    name: "paragraph",
-                    groups: ["list", "indent", "blocks", "align", "bidi"]
-                });
-                seperator2 = true;
-            }
-            if (this.toolbarLinks) {
-                this._settings[this.id].config.toolbarGroups.push({
-                    name: "links"
-                });
-                seperator2 = true;
-            }
-            if (this.toolbarInsert) {
-                this._settings[this.id].config.toolbarGroups.push({
-                    name: "insert"
-                });
-                seperator2 = true;
-            }
-
-            if (this.toolbarSeperator2) {
-                this._settings[this.id].config.toolbarGroups.push("/");
-            }
-
-            if (this.toolbarStyles) {
-                this._settings[this.id].config.toolbarGroups.push({
-                    name: "styles"
-                });
-            }
-            if (this.toolbarColors) {
-                this._settings[this.id].config.toolbarGroups.push({
-                    name: "colors"
-                });
-            }
-            if (this.toolbarTools) {
-                this._settings[this.id].config.toolbarGroups.push({
-                    name: "tools"
-                });
-
-            }
-            if (this.toolbarOthers) {
-                this._settings[this.id].config.toolbarGroups.push({
-                    name: "others"
-                });
-            }
+            this._addToolbars();
 
             this._settings[this.id].config.imageUploadUrl = "http://localhost/"; // not used
             this._settings[this.id].config.extraPlugins = this._getPlugins();
@@ -443,6 +355,77 @@ define([
                     logger.warn(this.id + ": you are trying to upload an image, but file uploading has been switched off. Contact the administrator");
                 }));
             }
+        },
+
+        _pushToolbar: function (obj, predicate) {
+            if (predicate) {
+                this._settings[this.id].config.toolbarGroups.push(obj);
+            }
+        },
+
+        _addToolbars: function () {
+            logger.debug(this.id + "._addToolbars");
+
+            if (!this.useCustomToolbar) {
+                this._pushToolbar({
+                    name: "document",     groups: ["mode", "document", "doctools"]
+                }, this.toolbarDocument);
+                this._pushToolbar({
+                    name: "clipboard",    groups: ["clipboard", "undo"]
+                }, this.toolbarClipboard);
+                this._pushToolbar({
+                    name: "editing",      groups: ["find", "selection", "spellchecker"]
+                }, this.toolbarEditing);
+
+                this._pushToolbar({  name: "forms" }, this.toolbarForms);
+                this._pushToolbar("/", this.toolbarSeperator1);
+
+                this._pushToolbar({
+                    name: "basicstyles",  groups: ["basicstyles", "cleanup"]
+                }, this.toolbarBasicstyles);
+                this._pushToolbar({
+                    name: "paragraph",    groups: ["list", "indent", "blocks", "align", "bidi"]
+                }, this.toolbarParagraph);
+
+                this._pushToolbar({ name: "links"  }, this.toolbarLinks);
+                this._pushToolbar({ name: "insert" }, this.toolbarInsert);
+                this._pushToolbar("/", this.toolbarSeperator2);
+                this._pushToolbar({ name: "styles" }, this.toolbarStyles);
+                this._pushToolbar({ name: "colors" }, this.toolbarColors);
+                this._pushToolbar({ name: "tools"  }, this.toolbarTools);
+                this._pushToolbar({ name: "others" }, this.toolbarOthers);
+            } else {
+                this._buildCustomToolbars();
+            }
+
+        },
+
+        _buildCustomToolbars: function () {
+            logger.debug(this.id + "._buildCustomToolbars");
+
+            var toolbarObj = {};
+            for (var i = 0; i < this.customToolbars.length; i++) {
+
+                var item = this.customToolbars[i],
+                    id = item.ctItemToolbar,
+                    type = item.ctItemType !== "seperator" ? item.ctItemType : "-";
+
+                if (!toolbarObj[id]) {
+                    toolbarObj[id] = [];
+                }
+                toolbarObj[id].push(type);
+            }
+
+            var keys = Object.keys(toolbarObj),
+                toolbarArray = [];
+
+            for (var j = 0; j < keys.length; j++) {
+                toolbarArray.push({
+                    name: keys[j], items: toolbarObj[keys[j]]
+                });
+            }
+
+            this._settings[this.id].config.toolbar = toolbarArray;
         },
 
         _fileUploadRequest: function (evt) {

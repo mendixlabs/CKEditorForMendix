@@ -1,5 +1,5 @@
 /* Mendix CKEditor paths */
-(function(){
+((function(){
     console.log('CKEDITOR SCRIPT LOADING.');
     if (typeof window.mxmob !== 'undefined'){
         window.CKEDITOR_BASEPATH = window.mxmob.app._currentURL + 'widgets/CKEditorForMendix/widget/lib/';
@@ -7,11 +7,11 @@
     } else {
         if (typeof window.mxapp !== 'undefined') {
             window.CKEDITOR_BASEPATH = window.mxapp._appUrl + 'widgets/CKEditorForMendix/widget/lib/';
-        } else {
+        } else if (typeof window.mx !== 'undefined') {
             window.CKEDITOR_BASEPATH = mx.appUrl + 'widgets/CKEditorForMendix/widget/lib/';
         }
     }
-}());
+}()));
 /*
 Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.md or http://ckeditor.com/license

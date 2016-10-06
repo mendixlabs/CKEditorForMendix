@@ -1,12 +1,11 @@
 {
   "name": "CKEditorForMendix",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "A new WYSIWYG editor for Mendix that also has the ability to create MicroFlow links in your HTML output.",
   "license": "Apache License, Version 2",
   "author": "Mendix",
   "private": true,
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "grunt": "1.0.1",
     "grunt-contrib-clean": "^1.0.0",
@@ -30,6 +29,9 @@
     "testProjectFileName": "Test.mpr"
   },
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt test",
+    "build": "grunt build",
+    "dev": "grunt",
+    "folders": "grunt folders"
   }
 }
