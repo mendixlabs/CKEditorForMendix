@@ -8,8 +8,9 @@ define([
     "dojo/text",
     "CKEditorForMendix/widget/lib/jquery",
     "CKEditorForMendix/widget/lib/ckeditor_viewer",
-    "dojo/text!CKEditorForMendix/widget/templates/CKEditorViewerForMendix.html"
-], function (declare, _WidgetBase, _TemplatedMixin, domStyle, dojoArray, lang, text, _jQuery, _CKEditorViewer, widgetTemplate) {
+    "dojo/text!CKEditorForMendix/widget/templates/CKEditorViewerForMendix.html",
+    "CKEditorForMendix/widget/lib/highlight.pack",
+], function (declare, _WidgetBase, _TemplatedMixin, domStyle, dojoArray, lang, text, _jQuery, _CKEditorViewer, widgetTemplate, hljs) {
     "use strict";
 
     var $ = _jQuery.noConflict(true);
@@ -58,6 +59,10 @@ define([
 
                 $(this.domNode).html("");
                 $(this.domNode).append(html);
+
+                $(this.domNode).find("pre code").each(function(i, block) {
+                  hljs.highlightBlock(block);
+                });
 
                 this.microflowButtonsPreventDefault();
             }

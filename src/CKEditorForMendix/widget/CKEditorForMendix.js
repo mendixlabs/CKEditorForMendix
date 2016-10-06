@@ -224,6 +224,10 @@ define([
                 plugins.push("wordcount");
             }
 
+            if (this.enableCodeHighlighting) {
+                plugins.push("codesnippet");
+            }
+
             logger.debug(this.id + "._getPlugins: " + plugins.join(","));
 
             return plugins.join(",");

@@ -157,6 +157,7 @@
                         <enumerationValue key="BulletedList">Bulleted List</enumerationValue>
                         <enumerationValue key="Button">Button</enumerationValue>
                         <enumerationValue key="Checkbox">Checkbox</enumerationValue>
+                        <enumerationValue key="CodeSnippet">Code Snippet</enumerationValue>
                         <enumerationValue key="Copy">Copy</enumerationValue>
                         <enumerationValue key="CreateDiv">Create Div</enumerationValue>
                         <enumerationValue key="Cut">Cut</enumerationValue>
@@ -192,11 +193,11 @@
                         <enumerationValue key="Print">Print</enumerationValue>
                         <enumerationValue key="Radio">Radio</enumerationValue>
                         <enumerationValue key="Redo">Redo</enumerationValue>
-                        <enumerationValue key="RemoveFormat">RemoveFormat</enumerationValue>
+                        <enumerationValue key="RemoveFormat">Remove Format</enumerationValue>
                         <enumerationValue key="Replace">Replace</enumerationValue>
                         <enumerationValue key="Scayt">Scayt</enumerationValue>
                         <enumerationValue key="Select">Select</enumerationValue>
-                        <enumerationValue key="SelectAll">SelectAll</enumerationValue>
+                        <enumerationValue key="SelectAll">Select All</enumerationValue>
                         <enumerationValue key="ShowBlocks">Show Blocks</enumerationValue>
                         <enumerationValue key="Smiley">Smiley</enumerationValue>
                         <enumerationValue key="Source">Source</enumerationValue>
@@ -266,6 +267,14 @@
             <caption>Collapse toolbar</caption>
             <category>Appearance</category>
             <description>If you enable this, the toolbar at the top of the editor will be collapsed by default. (The user can expand it by clicking the button at the topright corner)</description>
+        </property>
+        <!--
+            CODE HIGHLIGHTING
+        -->
+        <property key="enableCodeHighlighting" type="boolean" defaultValue="false">
+            <caption>Enable code highlighting</caption>
+            <category>Code</category>
+            <description>CKEditor can be used as a code editor. If you want to enable code highlighting, please enable this. Note: You should add enable this for the Viewer as well</description>
         </property>
         <!--
             MICROFLOW LINKS
