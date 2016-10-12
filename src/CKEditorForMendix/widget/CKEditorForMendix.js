@@ -437,9 +437,6 @@ define([
             var fileLoader = evt.data.fileLoader,
                 file = fileLoader.file;
 
-            console.log(this);
-            return;
-
             mx.data.create({
                 entity: this._imageEntity,
                 callback: lang.hitch(this, function (obj) {
