@@ -69,8 +69,9 @@ define([
 
                 if (this.cutOffRules !== null && this.cutOffRules > 0) {
                     $(this.domNode).dotdotdot({
-                        height: this.cutOffRules
-                        // configuration goes here
+                        height: this.cutOffRules,
+                        wrap: "letter",
+                        watch: true
                     });
                 }
 
