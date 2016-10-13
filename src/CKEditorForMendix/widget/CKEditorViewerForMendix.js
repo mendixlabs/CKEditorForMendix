@@ -69,7 +69,7 @@ define([
 
                 if (this.cutOffRules !== null && this.cutOffRules > 0) {
                     $(this.domNode).dotdotdot({
-                        height: 100
+                        height: this.cutOffRules
                         // configuration goes here
                     });
                 }
