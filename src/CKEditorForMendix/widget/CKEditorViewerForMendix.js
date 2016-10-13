@@ -10,6 +10,8 @@ define([
     "CKEditorForMendix/widget/lib/ckeditor_viewer",
     "dojo/text!CKEditorForMendix/widget/templates/CKEditorViewerForMendix.html",
     "CKEditorForMendix/widget/lib/highlight.pack",
+
+    "CKEditorForMendix/widget/lib/dotdot.jquery",
 ], function (declare, _WidgetBase, _TemplatedMixin, domStyle, dojoArray, lang, text, _jQuery, _CKEditorViewer, widgetTemplate, hljs) {
     "use strict";
 
@@ -22,6 +24,7 @@ define([
 
         _contextObj: null,
         _handles: null,
+        cutOffRules: null,
 
         update: function (obj, callback) {
             //logger.level(logger.DEBUG);
@@ -63,6 +66,13 @@ define([
                 $(this.domNode).find("pre code").each(function(i, block) {
                   hljs.highlightBlock(block);
                 });
+
+                if (this.cutOffRules !== null && this.cutOffRules > 0) {
+                    $(this.domNode).dotdotdot({
+                        height: 100
+                        // configuration goes here
+                    });
+                }
 
                 this.microflowButtonsPreventDefault();
             }
