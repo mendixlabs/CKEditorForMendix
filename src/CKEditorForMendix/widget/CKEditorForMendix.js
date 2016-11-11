@@ -1,20 +1,20 @@
 define([
-        "dojo/_base/declare",
-        "mxui/widget/_WidgetBase",
-        "dijit/_TemplatedMixin",
-        "mxui/dom",
-        "dojo/dom-style",
-        "dojo/dom-class",
-        "dojo/dom-construct",
-        "dojo/html",
-        "dojo/_base/array",
-        "dojo/_base/lang",
-        "dojo/text",
-        "CKEditorForMendix/widget/lib/jquery",
-        "CKEditorForMendix/widget/lib/ckeditor",
-        "dojo/text!CKEditorForMendix/widget/templates/CKEditorForMendix.html",
-        "CKEditorForMendix/widget/lib/jquery.oembed"
-    ], function (declare, _WidgetBase, _TemplatedMixin, dom, domStyle, dojoClass, domConstruct, html, dojoArray, lang, text, _jQuery, _CKEditor, widgetTemplate) {
+    "dojo/_base/declare",
+    "mxui/widget/_WidgetBase",
+    "dijit/_TemplatedMixin",
+    "mxui/dom",
+    "dojo/dom-style",
+    "dojo/dom-class",
+    "dojo/dom-construct",
+    "dojo/html",
+    "dojo/_base/array",
+    "dojo/_base/lang",
+    "dojo/text",
+    "CKEditorForMendix/widget/lib/jquery",
+    "CKEditorForMendix/widget/lib/ckeditor",
+    "dojo/text!CKEditorForMendix/widget/templates/CKEditorForMendix.html",
+    "CKEditorForMendix/widget/lib/jquery.oembed"
+], function(declare, _WidgetBase, _TemplatedMixin, dom, domStyle, dojoClass, domConstruct, html, dojoArray, lang, text, _jQuery, _CKEditor, widgetTemplate) {
     "use strict";
 
     var $ = _jQuery.noConflict(true),
@@ -31,7 +31,7 @@ define([
         _contextObj: null,
         _handles: null,
         _alertdiv: null,
-        _hasStarted : false,
+        _hasStarted: false,
         _isReadOnly: false,
         _focus: false,
 
@@ -59,7 +59,7 @@ define([
 
         templateString: widgetTemplate,
 
-        postCreate: function () {
+        postCreate: function() {
             logger.debug(this.id + ".postCreate");
 
             this._CKEditor = window.CKEDITOR;
@@ -77,7 +77,7 @@ define([
                 }
             }
 
-            if( this.showLabel ) {
+            if (this.showLabel) {
                 if (dojoClass.contains(this.ckEditorLabel, "hidden")) {
                     dojoClass.remove(this.ckEditorLabel, "hidden");
                 }
@@ -101,7 +101,7 @@ define([
             }
         },
 
-        update: function (obj, callback) {
+        update: function(obj, callback) {
             logger.debug(this.id + ".update");
 
             this._contextObj = obj;
@@ -115,11 +115,11 @@ define([
             }
         },
 
-        _setupEvents: function () {
+        _setupEvents: function() {
             logger.debug(this.id + "._setupEvents");
 
             // On change event (== on keypress)
-            this._editor.on("change", lang.hitch(this, function () {
+            this._editor.on("change", lang.hitch(this, function() {
                 this._editorChange(this._editor.getData());
 
                 if (this.onKeyPressMicroflow) {
@@ -132,21 +132,20 @@ define([
                         store: {
                             caller: this.mxform
                         },
-                        callback: function (obj) {
-                        },
-                        error: function (error) {
+                        callback: function(obj) {},
+                        error: function(error) {
                             console.log(this.id + ": An error occurred while executing microflow: " + error.description);
                         }
                     }, this);
                 }
             }));
 
-            this._editor.on("focus", lang.hitch(this, function (e) {
+            this._editor.on("focus", lang.hitch(this, function(e) {
                 this._focus = true;
             }));
 
             //On blur (unselecting the textbox) event
-            this._editor.on("blur", lang.hitch(this, function (e) {
+            this._editor.on("blur", lang.hitch(this, function(e) {
                 this._focus = false;
                 if (this._editor.mode !== "source" && this._editor.checkDirty() && this.onChangeMicroflow && !this._strReadOnly()) {
                     mx.data.action({
@@ -155,10 +154,10 @@ define([
                             actionname: this.onChangeMicroflow,
                             guids: [this._contextObj.getGuid()]
                         },
-                        callback: lang.hitch(this, function (obj) {
+                        callback: lang.hitch(this, function(obj) {
                             this._editor.resetDirty();
                         }),
-                        error: lang.hitch(this, function (error) {
+                        error: lang.hitch(this, function(error) {
                             console.log(this.id + ": An error occurred while executing microflow: " + error.description);
                         })
                     }, this);
@@ -166,17 +165,17 @@ define([
 
             }));
 
-            this._editor.on("mode", lang.hitch(this, function () {
+            this._editor.on("mode", lang.hitch(this, function() {
                 var $textarea = $("textarea.cke_source", this.domNode);
                 if (this._editor.mode === "source" && $textarea.length) {
-                    $textarea.on("keyup", lang.hitch(this, function () {
+                    $textarea.on("keyup", lang.hitch(this, function() {
                         this._editor.fire("change");
                     }));
                 }
             }));
         },
 
-        _executeMf: function (obj, mf, callback) {
+        _executeMf: function(obj, mf, callback) {
             logger.debug(this.id + "._executeMf: ", mf);
             if (obj && mf !== "") {
                 mx.data.action({
@@ -188,22 +187,22 @@ define([
                     store: {
                         caller: this.mxform
                     },
-                    callback: callback || function () {},
-                    error: lang.hitch(this, function (error) {
+                    callback: callback || function() {},
+                    error: lang.hitch(this, function(error) {
                         console.log(this.id + ": An error occurred while executing microflow: " + error.description);
                     })
                 }, this);
             }
         },
 
-        _editorChange: function (data) {
+        _editorChange: function(data) {
             logger.debug(this.id + "._editorChange:");
             if (this._contextObj !== null) {
                 this._contextObj.set(this.messageString, data);
             }
         },
 
-        _getPlugins: function (imageUpload) {
+        _getPlugins: function(imageUpload) {
             var plugins = [
                 "divarea",
                 "mendixlink",
@@ -234,7 +233,7 @@ define([
         },
 
         // Create child nodes.
-        _createChildNodes: function (callback) {
+        _createChildNodes: function(callback) {
             logger.debug(this.id + "._createChildNodes");
             this.CKEditorForMendixNode.appendChild(dom.create("textarea", {
                 "name": "html_editor_" + this.id,
@@ -312,7 +311,7 @@ define([
             this._editor.config.shiftEnterMode = this._CKEditor["ENTER_" + this.shiftEnterMode];
 
             // Set autoparagraph
-            this._editor.config.autoParagraph  = this.autoParagraph;
+            this._editor.config.autoParagraph = this.autoParagraph;
 
             // Attach Mendix Widget to editor and pass the mendix widget configuration to the CKEditor.
             this._editor.mendixWidget = this;
@@ -329,7 +328,7 @@ define([
                 // Add filters for images that have a data-image-guid tag
                 event.editor.dataProcessor.dataFilter.addRules({
                     elements: {
-                        img: lang.hitch(this, function (element) {
+                        img: lang.hitch(this, function(element) {
                             var guid = element.attributes["data-image-guid"];
                             if (guid) {
                                 element.attributes.src = this._getFileUrl(guid);
@@ -338,9 +337,9 @@ define([
                     }
                 });
 
-                event.editor.dataProcessor.htmlFilter.addRules ({
+                event.editor.dataProcessor.htmlFilter.addRules({
                     elements: {
-                        img: function (element) {
+                        img: function(element) {
                             var guid = element.attributes["data-image-guid"];
                             if (guid) {
                                 element.attributes.src = "file?guid=" + guid;
@@ -353,58 +352,77 @@ define([
             }));
 
             if (this._useImageUpload) {
-                this._editor.on( "fileUploadRequest", lang.hitch(this, this._fileUploadRequest));
+                this._editor.on("fileUploadRequest", lang.hitch(this, this._fileUploadRequest));
             } else {
-                this._editor.on( "fileUploadRequest", lang.hitch(this, function () {
+                this._editor.on("fileUploadRequest", lang.hitch(this, function() {
                     logger.warn(this.id + ": you are trying to upload an image, but file uploading has been switched off. Contact the administrator");
                 }));
             }
         },
 
-        _pushToolbar: function (obj, predicate) {
+        _pushToolbar: function(obj, predicate) {
             if (predicate) {
                 this._settings[this.id].config.toolbarGroups.push(obj);
             }
         },
 
-        _addToolbars: function () {
+        _addToolbars: function() {
             logger.debug(this.id + "._addToolbars");
 
             if (!this.useCustomToolbar) {
                 this._pushToolbar({
-                    name: "document",     groups: ["mode", "document", "doctools"]
+                    name: "document",
+                    groups: ["mode", "document", "doctools"]
                 }, this.toolbarDocument);
                 this._pushToolbar({
-                    name: "clipboard",    groups: ["clipboard", "undo"]
+                    name: "clipboard",
+                    groups: ["clipboard", "undo"]
                 }, this.toolbarClipboard);
                 this._pushToolbar({
-                    name: "editing",      groups: ["find", "selection", "spellchecker"]
+                    name: "editing",
+                    groups: ["find", "selection", "spellchecker"]
                 }, this.toolbarEditing);
 
-                this._pushToolbar({  name: "forms" }, this.toolbarForms);
+                this._pushToolbar({
+                    name: "forms"
+                }, this.toolbarForms);
                 this._pushToolbar("/", this.toolbarSeperator1);
 
                 this._pushToolbar({
-                    name: "basicstyles",  groups: ["basicstyles", "cleanup"]
+                    name: "basicstyles",
+                    groups: ["basicstyles", "cleanup"]
                 }, this.toolbarBasicstyles);
                 this._pushToolbar({
-                    name: "paragraph",    groups: ["list", "indent", "blocks", "align", "bidi"]
+                    name: "paragraph",
+                    groups: ["list", "indent", "blocks", "align", "bidi"]
                 }, this.toolbarParagraph);
 
-                this._pushToolbar({ name: "links"  }, this.toolbarLinks);
-                this._pushToolbar({ name: "insert" }, this.toolbarInsert);
+                this._pushToolbar({
+                    name: "links"
+                }, this.toolbarLinks);
+                this._pushToolbar({
+                    name: "insert"
+                }, this.toolbarInsert);
                 this._pushToolbar("/", this.toolbarSeperator2);
-                this._pushToolbar({ name: "styles" }, this.toolbarStyles);
-                this._pushToolbar({ name: "colors" }, this.toolbarColors);
-                this._pushToolbar({ name: "tools"  }, this.toolbarTools);
-                this._pushToolbar({ name: "others" }, this.toolbarOthers);
+                this._pushToolbar({
+                    name: "styles"
+                }, this.toolbarStyles);
+                this._pushToolbar({
+                    name: "colors"
+                }, this.toolbarColors);
+                this._pushToolbar({
+                    name: "tools"
+                }, this.toolbarTools);
+                this._pushToolbar({
+                    name: "others"
+                }, this.toolbarOthers);
             } else {
                 this._buildCustomToolbars();
             }
 
         },
 
-        _buildCustomToolbars: function () {
+        _buildCustomToolbars: function() {
             logger.debug(this.id + "._buildCustomToolbars");
 
             var toolbarObj = {};
@@ -425,21 +443,22 @@ define([
 
             for (var j = 0; j < keys.length; j++) {
                 toolbarArray.push({
-                    name: keys[j], items: toolbarObj[keys[j]]
+                    name: keys[j],
+                    items: toolbarObj[keys[j]]
                 });
             }
 
             this._settings[this.id].config.toolbar = toolbarArray;
         },
 
-        _fileUploadRequest: function (evt) {
+        _fileUploadRequest: function(evt) {
             logger.debug(this.id + "._fileUploadRequest");
             var fileLoader = evt.data.fileLoader,
                 file = fileLoader.file;
 
             mx.data.create({
                 entity: this._imageEntity,
-                callback: lang.hitch(this, function (obj) {
+                callback: lang.hitch(this, function(obj) {
                     logger.debug(this.id + "._fileUploadRequest Image entity created");
 
                     if (this._setReference && this._imageReference) {
@@ -456,11 +475,11 @@ define([
                     var upload = new Upload({
                         objectGuid: guid,
                         maxFileSize: file.size,
-                        startUpload: lang.hitch(this, function () {
+                        startUpload: lang.hitch(this, function() {
                             logger.debug(this.id + "._fileUploadRequest uploading");
                             fileLoader.changeStatus("uploading");
                         }),
-                        finishUpload: lang.hitch(this, function () {
+                        finishUpload: lang.hitch(this, function() {
                             logger.debug(this.id + "._fileUploadRequest finished uploading");
                         }),
                         form: {
@@ -470,7 +489,7 @@ define([
                                 ]
                             }
                         },
-                        callback: lang.hitch(this, function () {
+                        callback: lang.hitch(this, function() {
                             logger.debug(this.id + "._fileUploadRequest uploaded");
                             fileLoader.url = "file?guid=" + guid;
                             fileLoader.guid = guid;
@@ -482,7 +501,7 @@ define([
 
                             this._editor.fire("change");
                         }),
-                        error: lang.hitch(this, function (err) {
+                        error: lang.hitch(this, function(err) {
                             console.error(this.id + "._fileUploadRequest error uploading", arguments);
                             fileLoader.message = "Error uploading: " + err.toString();
                             fileLoader.changeStatus("error");
@@ -491,7 +510,7 @@ define([
 
                     upload.upload();
                 }),
-                error: lang.hitch(this, function (err) {
+                error: lang.hitch(this, function(err) {
                     logger.debug(this.id + "._fileUploadRequest Image entity failed to create");
                     fileLoader.message = "Error uploading: " + err.toString();
                     fileLoader.changeStatus("error");
@@ -501,7 +520,7 @@ define([
             evt.stop();
         },
 
-        _handleValidation: function (validations) {
+        _handleValidation: function(validations) {
             logger.debug(this.id + "._handleValidation");
             this._clearValidations();
 
@@ -518,12 +537,12 @@ define([
             }
         },
 
-        _clearValidations: function () {
+        _clearValidations: function() {
             logger.debug(this.id + "._clearValidations");
             domConstruct.destroy(this._alertdiv);
         },
 
-        _addValidation: function (msg) {
+        _addValidation: function(msg) {
             logger.debug(this.id + "._addValidation");
             this._alertdiv = domConstruct.create("div", {
                 "class": "alert alert-danger",
@@ -533,17 +552,17 @@ define([
             this.CKEditorForMendixNode.appendChild(this._alertdiv);
         },
 
-        _updateAttrRendering: function () {
+        _updateAttrRendering: function() {
             if (!this._focus) {
                 this._updateRendering();
             }
         },
 
-        _strReadOnly: function () {
+        _strReadOnly: function() {
             return this._contextObj.isReadonlyAttr && this._contextObj.isReadonlyAttr(this.messageString);
         },
 
-        _updateRendering: function (callback) {
+        _updateRendering: function(callback) {
             logger.debug(this.id + "._updateRendering");
 
             if (!this._editor && !this._isReadOnly) {
@@ -571,7 +590,7 @@ define([
             }
         },
 
-        _resetSubscriptions: function () {
+        _resetSubscriptions: function() {
             logger.debug(this.id + "._resetSubscriptions");
             var objHandle = null,
                 attrHandle = null,
@@ -579,7 +598,7 @@ define([
 
             // Release handles on previous object, if any.
             if (this._handles) {
-                dojoArray.forEach(this._handles, function (handle) {
+                dojoArray.forEach(this._handles, function(handle) {
                     mx.data.unsubscribe(handle);
                 });
             }
@@ -587,7 +606,7 @@ define([
             if (this._contextObj) {
                 objHandle = this.subscribe({
                     guid: this._contextObj.getGuid(),
-                    callback: lang.hitch(this, function (guid) {
+                    callback: lang.hitch(this, function(guid) {
                         this._updateRendering();
                     })
                 });
@@ -595,7 +614,7 @@ define([
                 attrHandle = this.subscribe({
                     guid: this._contextObj.getGuid(),
                     attr: this.messageString,
-                    callback: lang.hitch(this,function(guid,attr,attrValue) {
+                    callback: lang.hitch(this, function(guid, attr, attrValue) {
                         this._updateAttrRendering();
                     })
                 });
@@ -610,21 +629,21 @@ define([
             }
         },
 
-        retrieveImages: function (callback) {
-            this.retrieveImageObjects(lang.hitch(this,function (objs) {
+        retrieveImages: function(callback) {
+            this.retrieveImageObjects(lang.hitch(this, function(objs) {
                 var images = [];
-                dojo.forEach(objs, function (obj, i) {
+                dojo.forEach(objs, function(obj, i) {
                     images.push({
                         guid: obj.getGuid(),
                         thumbnailUrl: this._getFileUrl(obj.getGuid()) + "&thumb=true",
-                        imageUrl:  "file?guid=" + obj.getGuid()
+                        imageUrl: "file?guid=" + obj.getGuid()
                     });
                 }, this);
                 callback(images);
             }));
         },
 
-        _getFileUrl: function (guid) {
+        _getFileUrl: function(guid) {
             var changedDate = Math.floor(Date.now() / 1); // Right now;
             if (mx.data.getDocumentUrl) {
                 return mx.data.getDocumentUrl(guid, changedDate, false);
@@ -635,29 +654,29 @@ define([
             ].join("&");
         },
 
-		retrieveImageObjects : function (callback, offset, search) {
+        retrieveImageObjects: function(callback, offset, search) {
             logger.debug(this.id + ".retrieveImages");
-			this._getObjects("//" + this._imageEntity + this.imageconstraint + this.getSearchConstraint("Name", search), callback);
-		},
+            this._getObjects("//" + this._imageEntity + this.imageconstraint + this.getSearchConstraint("Name", search), callback);
+        },
 
-		_getObjects: function (query, callback) {
+        _getObjects: function(query, callback) {
             logger.debug(this.id + "._getObjects");
-			query = query.replace(/\[\%CurrentObject\%\]/gi, this._contextObj);
+            query = query.replace(/\[\%CurrentObject\%\]/gi, this._contextObj);
             mx.data.get({
                 xpath: query,
                 callback: callback
             });
-		},
+        },
 
-        getSearchConstraint: function (attr, search) {
+        getSearchConstraint: function(attr, search) {
             logger.debug(this.id + ".getSearchConstraint");
-			if(dojo.isString(search) && dojo.isString(attr) && attr !== "") {
-				return "[contains(" + attr + ", '" + html.escapeString(search) + "')]";
-			}
-			return "";
-		},
+            if (dojo.isString(search) && dojo.isString(attr) && attr !== "") {
+                return "[contains(" + attr + ", '" + html.escapeString(search) + "')]";
+            }
+            return "";
+        },
 
-        uninitialize: function () {
+        uninitialize: function() {
             logger.debug(this.id + ".uninitialize");
             if (this._editor) {
                 this._editor.removeAllListeners();
