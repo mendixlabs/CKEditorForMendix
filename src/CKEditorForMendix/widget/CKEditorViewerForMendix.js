@@ -49,6 +49,10 @@ define([
                 var html = this._contextObj.get(this.messageString),
                     name = Date.now ? Date.now() : +new Date();
 
+                if (!html) {
+                  html = "";
+                }
+
                 // Set the content of the link.
                 window.CKEditorViewer.data[this.id] = {};
                 window.CKEditorViewer.data[this.id].microflowLinks = this.microflowLinks;

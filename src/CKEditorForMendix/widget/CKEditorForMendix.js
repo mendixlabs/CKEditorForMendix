@@ -123,20 +123,7 @@ define([
                 this._editorChange(this._editor.getData());
 
                 if (this.onKeyPressMicroflow) {
-                    mx.data.action({
-                        params: {
-                            applyto: "selection",
-                            actionname: this.onKeyPressMicroflow,
-                            guids: [this._contextObj.getGuid()]
-                        },
-                        store: {
-                            caller: this.mxform
-                        },
-                        callback: function(obj) {},
-                        error: function(error) {
-                            console.log(this.id + ": An error occurred while executing microflow: " + error.description);
-                        }
-                    }, this);
+                    this._executeMf(this._contextObj, this.onKeyPressMicroflow);
                 }
             }));
 
@@ -148,19 +135,9 @@ define([
             this._editor.on("blur", lang.hitch(this, function(e) {
                 this._focus = false;
                 if (this._editor.mode !== "source" && this._editor.checkDirty() && this.onChangeMicroflow && !this._strReadOnly()) {
-                    mx.data.action({
-                        params: {
-                            applyto: "selection",
-                            actionname: this.onChangeMicroflow,
-                            guids: [this._contextObj.getGuid()]
-                        },
-                        callback: lang.hitch(this, function(obj) {
-                            this._editor.resetDirty();
-                        }),
-                        error: lang.hitch(this, function(error) {
-                            console.log(this.id + ": An error occurred while executing microflow: " + error.description);
-                        })
-                    }, this);
+                    this._executeMf(this._contextObj, this.onChangeMicroflow, lang.hitch(this, function (obj) {
+                        this._editor.resetDirty();
+                    }));
                 }
 
             }));
@@ -243,54 +220,49 @@ define([
             }));
 
             // Create new config
-            this._settings = [];
-            this._settings[this.id] = {
-                config: {
-                    toolbarGroups: [],
-                    oembed_WrapperClass: "embededContent"
-                }
+            var config = {
+                toolbarGroups: [],
+                oembed_WrapperClass: "embededContent",
+                // Collapsable toolbar
+                toolbarCanCollapse: true,
+                toolbarStartupExpanded: !this.showToolbarCollapsed,
+                // Maximize offset
+                maximizeOffset: this.maximizeOffset,
+                autoGrow_minHeight : 300,
+                //Autogrow functionality of the editor.
+                autoGrow_onStartup : true,
+                // Base URL inside CKEditor
+                baseHref : mx.appUrl,
+                imageUploadUrl : "http://localhost/", // not used
+                extraPlugins : this._getPlugins(),
+                extraAllowedContent : "*[data-*]",
+                // Set enterMode
+                enterMode : this._CKEditor["ENTER_" + this.enterMode],
+                shiftEnterMode : this._CKEditor["ENTER_" + this.shiftEnterMode],
+                // Set paragraph
+                autoParagraph : this.autoParagraph
             };
 
-            // Collapsable toolbar
-            this._settings[this.id].config.toolbarCanCollapse = true;
-            this._settings[this.id].config.toolbarStartupExpanded = !this.showToolbarCollapsed;
-
-            // Maximize offset
-            this._settings[this.id].config.maximizeOffset = this.maximizeOffset;
-
             if (!this.showStatusBar) {
-                this._settings[this.id].config.removePlugins = "elementspath";
-                this._settings[this.id].config.resize_enabled = false;
+                config.removePlugins = "elementspath";
+                config.resize_enabled = false;
             }
 
             // Autogrow functionality of the editor.
-            this._settings[this.id].config.autoGrow_minHeight = 300;
-            this._settings[this.id].config.autoGrow_onStartup = true;
             if (this.width > 0) {
-                this._settings[this.id].config.width = this.width;
+                config.width = this.width;
             }
             if (this.height > 0) {
-                this._settings[this.id].config.height = this.height;
+                config.height = this.height;
             }
-
-
-            // Base URL inside CKEditor
-            this._settings[this.id].config.baseHref = mx.appUrl;
 
             // CSS class
             if (this.bodyCssClass !== "") {
-                this._settings[this.id].config.bodyClass = this.bodyCssClass;
+                config.bodyClass = this.bodyCssClass;
             }
 
-            this._CKEditor.config.toolbarGroups = [];
-
-            this._addToolbars();
-
-            this._settings[this.id].config.imageUploadUrl = "http://localhost/"; // not used
-            this._settings[this.id].config.extraPlugins = this._getPlugins();
-
             if (this.countPlugin) {
-                this._settings[this.id].config.wordcount = {
+                config.wordcount = {
                     showParagraphs: false,
                     showWordCount: true,
                     showCharCount: true,
@@ -301,17 +273,17 @@ define([
                 };
             }
 
-            this._settings[this.id].config.extraAllowedContent = "*[data-*]";
+            // Create config
+            this._settings = [];
+            this._settings[this.id] = {
+                config: config
+            };
+
+            // Add toolbars (we add these to the config)
+            this._addToolbars();
 
             // Create a CKEditor from HTML element.
             this._editor = this._CKEditor.replace("html_editor_" + this.id, this._settings[this.id].config);
-
-            // Set enterMode
-            this._editor.config.enterMode = this._CKEditor["ENTER_" + this.enterMode];
-            this._editor.config.shiftEnterMode = this._CKEditor["ENTER_" + this.shiftEnterMode];
-
-            // Set autoparagraph
-            this._editor.config.autoParagraph = this.autoParagraph;
 
             // Attach Mendix Widget to editor and pass the mendix widget configuration to the CKEditor.
             this._editor.mendixWidget = this;
