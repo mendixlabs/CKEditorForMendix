@@ -34,7 +34,7 @@ define([
 
             if (obj && typeof obj.metaData === "undefined") {
                 logger.warn(this.id + ".update Error: CKeditorViewer was configured for an entity the current user has no access to.");
-                mendix.lang.nullExec(callback);
+                this._executeCallback(callback, "update");
             } else {
                 this._resetSubscriptions();
                 this._updateRendering(callback);
@@ -85,10 +85,7 @@ define([
                 domStyle.set(this.domNode, "display", "none");
             }
 
-            if (callback && typeof callback === "function") {
-                logger.debug(this.id + "._updateRendering.callback");
-                callback();
-            }
+            this._executeCallback(callback, "_updateRendering");
         },
 
         microflowButtonsPreventDefault: function () {
@@ -126,9 +123,9 @@ define([
 
             // Release handles on previous object, if any.
             if(this._handles){
-                dojoArray.forEach(this._handles, function (handle) {
-                    mx.data.unsubscribe(handle);
-                });
+                dojoArray.forEach(this._handles, lang.hitch(this, function (handle) {
+                    this.unsubscribe(handle);
+                }));
             }
 
             if (this._contextObj) {
@@ -148,6 +145,13 @@ define([
                 });
 
                 this._handles = [objHandle, attrHandle];
+            }
+        },
+
+        _executeCallback: function (cb, from) {
+            logger.debug(this.id + "._executeCallback " + (typeof cb) + (from ? " from " + from : ""));
+            if (cb && typeof cb === "function") {
+                cb();
             }
         }
 

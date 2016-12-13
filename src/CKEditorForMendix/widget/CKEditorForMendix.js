@@ -13,12 +13,13 @@ define([
     "CKEditorForMendix/widget/lib/jquery",
     "CKEditorForMendix/widget/lib/ckeditor",
     "dojo/text!CKEditorForMendix/widget/templates/CKEditorForMendix.html",
-    "CKEditorForMendix/widget/lib/jquery.oembed"
-], function(declare, _WidgetBase, _TemplatedMixin, dom, domStyle, dojoClass, domConstruct, html, dojoArray, lang, text, _jQuery, _CKEditor, widgetTemplate) {
+    "CKEditorForMendix/widget/lib/jquery.oembed",
+    "mendix/lib/Upload"
+], function(declare, _WidgetBase, _TemplatedMixin, dom, domStyle, dojoClass, domConstruct, html, dojoArray, lang, text, _jQuery, _CKEditor, widgetTemplate, MxUpload) {
     "use strict";
 
     var $ = _jQuery.noConflict(true),
-        Upload = mendix.lib.Upload;
+        Upload = MxUpload || mendix.lib.Upload;
 
     return declare("CKEditorForMendix.widget.CKEditorForMendix", [_WidgetBase, _TemplatedMixin], {
 
@@ -108,7 +109,7 @@ define([
 
             if (obj && typeof obj.metaData === "undefined") {
                 logger.warn(this.id + ".update Error: CKeditor was configured for an entity the current user has no access to.");
-                mendix.lang.nullExec(callback);
+                this._executeCallback(callback, "update");
             } else {
                 this._resetSubscriptions();
                 this._updateRendering(callback);
@@ -555,10 +556,7 @@ define([
                     domStyle.set(this.domNode, "visibility", "hidden");
                 }
 
-                if (callback && typeof callback === "function") {
-                    logger.debug(this.id + "._updateRendering.callback");
-                    callback();
-                }
+                this._executeCallback(callback, "_updateRendering");
             }
         },
 
@@ -570,9 +568,9 @@ define([
 
             // Release handles on previous object, if any.
             if (this._handles) {
-                dojoArray.forEach(this._handles, function(handle) {
-                    mx.data.unsubscribe(handle);
-                });
+                dojoArray.forEach(this._handles, lang.hitch(this, function(handle) {
+                    this.unsubscribe(handle);
+                }));
             }
 
             if (this._contextObj) {
@@ -591,7 +589,7 @@ define([
                     })
                 });
 
-                validationHandle = mx.data.subscribe({
+                validationHandle = this.subscribe({
                     guid: this._contextObj.getGuid(),
                     val: true,
                     callback: lang.hitch(this, this._handleValidation)
@@ -653,6 +651,13 @@ define([
             if (this._editor) {
                 this._editor.removeAllListeners();
                 this._editor.destroy();
+            }
+        },
+
+        _executeCallback: function (cb, from) {
+            logger.debug(this.id + "._executeCallback " + (typeof cb) + (from ? " from " + from : ""));
+            if (cb && typeof cb === "function") {
+                cb();
             }
         }
     });
