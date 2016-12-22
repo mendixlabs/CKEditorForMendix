@@ -13,13 +13,12 @@ define([
     "CKEditorForMendix/widget/lib/jquery",
     "CKEditorForMendix/widget/lib/ckeditor",
     "dojo/text!CKEditorForMendix/widget/templates/CKEditorForMendix.html",
-    "CKEditorForMendix/widget/lib/jquery.oembed",
-    "mendix/lib/Upload"
-], function(declare, _WidgetBase, _TemplatedMixin, dom, domStyle, dojoClass, domConstruct, html, dojoArray, lang, text, _jQuery, _CKEditor, widgetTemplate, MxUpload) {
+    "CKEditorForMendix/widget/lib/jquery.oembed"
+], function(declare, _WidgetBase, _TemplatedMixin, dom, domStyle, dojoClass, domConstruct, html, dojoArray, lang, text, _jQuery, _CKEditor, widgetTemplate) {
     "use strict";
 
     var $ = _jQuery.noConflict(true),
-        Upload = MxUpload || mendix.lib.Upload;
+        Upload = mendix.lib.Upload; // This needs to be fixed for future version. Remove Upload and use mx.data.saveDocument, make a distinction
 
     return declare("CKEditorForMendix.widget.CKEditorForMendix", [_WidgetBase, _TemplatedMixin], {
 
