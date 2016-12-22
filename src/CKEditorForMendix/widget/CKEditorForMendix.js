@@ -17,14 +17,12 @@ define([
 ], function(declare, _WidgetBase, _TemplatedMixin, dom, domStyle, dojoClass, domConstruct, html, dojoArray, lang, text, _jQuery, _CKEditor, widgetTemplate) {
     "use strict";
 
-    var $ = _jQuery.noConflict(true),
-        Upload = mendix.lib.Upload; // This needs to be fixed for future version. Remove Upload and use mx.data.saveDocument, make a distinction
+    var $ = _jQuery.noConflict(true);
 
     return declare("CKEditorForMendix.widget.CKEditorForMendix", [_WidgetBase, _TemplatedMixin], {
 
         // Set by the Modeler
         imageUploadMicroflow: "",
-        //customToolbars: [],
 
         // Internal values
         _contextGuid: null,
@@ -155,20 +153,23 @@ define([
         _executeMf: function(obj, mf, callback) {
             logger.debug(this.id + "._executeMf: ", mf);
             if (obj && mf !== "") {
-                mx.data.action({
+                var mfAction = {
                     params: {
                         applyto: "selection",
                         actionname: mf,
                         guids: [obj.getGuid()]
                     },
-                    store: {
-                        caller: this.mxform
-                    },
                     callback: callback || function() {},
                     error: lang.hitch(this, function(error) {
                         console.log(this.id + ": An error occurred while executing microflow: " + error.description);
                     })
-                }, this);
+                };
+                if (!mx.version) {
+                    mfAction.store = {
+                        caller: this.mxform
+                    };
+                }
+                mx.data.action(mfAction, this);
             }
         },
 
@@ -212,7 +213,7 @@ define([
         // Create child nodes.
         _createChildNodes: function(callback) {
             logger.debug(this.id + "._createChildNodes");
-            this.CKEditorForMendixNode.appendChild(dom.create("textarea", {
+            this.CKEditorForMendixNode.appendChild(domConstruct.create("textarea", {
                 "name": "html_editor_" + this.id,
                 "id": "html_editor_" + this.id,
                 "rows": "10",
@@ -444,43 +445,26 @@ define([
                     }
 
                     var guid = obj.getGuid();
-                    var upload = new Upload({
-                        objectGuid: guid,
-                        maxFileSize: file.size,
-                        startUpload: lang.hitch(this, function() {
-                            logger.debug(this.id + "._fileUploadRequest uploading");
-                            fileLoader.changeStatus("uploading");
-                        }),
-                        finishUpload: lang.hitch(this, function() {
-                            logger.debug(this.id + "._fileUploadRequest finished uploading");
-                        }),
-                        form: {
-                            mxdocument: {
-                                files: [
-                                    file
-                                ]
-                            }
-                        },
-                        callback: lang.hitch(this, function() {
-                            logger.debug(this.id + "._fileUploadRequest uploaded");
-                            fileLoader.url = "file?guid=" + guid;
-                            fileLoader.guid = guid;
-                            fileLoader.changeStatus("uploaded");
 
-                            if (this.imageUploadMicroflow) {
-                                this._executeMf(obj, this.imageUploadMicroflow);
-                            }
+                    this._upload(fileLoader, obj, file, lang.hitch(this, function (){
+                        // successCB
+                        logger.debug(this.id + "._fileUploadRequest uploaded");
+                        fileLoader.url = "file?guid=" + guid;
+                        fileLoader.guid = guid;
+                        fileLoader.changeStatus("uploaded");
 
-                            this._editor.fire("change");
-                        }),
-                        error: lang.hitch(this, function(err) {
-                            console.error(this.id + "._fileUploadRequest error uploading", arguments);
-                            fileLoader.message = "Error uploading: " + err.toString();
-                            fileLoader.changeStatus("error");
-                        })
-                    });
+                        if (this.imageUploadMicroflow) {
+                            this._executeMf(obj, this.imageUploadMicroflow);
+                        }
 
-                    upload.upload();
+                        this._editor.fire("change");
+                    }), lang.hitch(this, function (err) {
+                        // errorCB
+                        console.error(this.id + "._fileUploadRequest error uploading", arguments);
+                        fileLoader.message = "Error uploading: " + err.toString();
+                        fileLoader.changeStatus("error");
+                    }));
+
                 }),
                 error: lang.hitch(this, function(err) {
                     logger.debug(this.id + "._fileUploadRequest Image entity failed to create");
@@ -490,6 +474,49 @@ define([
                 scope: this._contextObj
             });
             evt.stop();
+        },
+
+        _upload: function (fileLoader, obj, file, successCB, errorCB) {
+            logger.debug(this.id + "._upload " + obj.getGuid() + ", using " + (mx.data.saveDocument ? "mx.data.saveDocument" : "mendix.lib.Upload"));
+
+            if (mx.data.saveDocument) {
+                // Mendix 6+ uses saveDocument
+                logger.debug(this.id + "._upload uploading");
+                fileLoader.changeStatus("uploading");
+                mx.data.saveDocument(obj.getGuid(), file.name, {}, file, lang.hitch(this, function () {
+                    logger.debug(this.id + "._upload finished uploading");
+                    successCB();
+                }), errorCB);
+            } else {
+                var Upload = mendix.lib.Upload;
+                if (Upload) {
+                    // Older versions (<Mendix 6)
+                    var upload = new Upload({
+                        objectGuid: obj.getGuid(),
+                        maxFileSize: file.size,
+                        startUpload: lang.hitch(this, function() {
+                            logger.debug(this.id + "._upload uploading");
+                            fileLoader.changeStatus("uploading");
+                        }),
+                        finishUpload: lang.hitch(this, function() {
+                            logger.debug(this.id + "._upload finished uploading");
+                        }),
+                        form: {
+                            mxdocument: {
+                                files: [
+                                    file
+                                ]
+                            }
+                        },
+                        callback: successCB,
+                        error: errorCB
+                    });
+
+                    upload.upload();
+                } else {
+                    console.error(this.id + "._upload cannot upload files!");
+                }
+            }
         },
 
         _handleValidation: function(validations) {
