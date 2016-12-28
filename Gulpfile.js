@@ -1,4 +1,4 @@
-// Generated on 2016-11-09 using generator-mendix 2.0.1 :: git+https://github.com/mendix/generator-mendix.git
+// Generated on 2016-12-28 using generator-mendix 2.0.4 :: git+https://github.com/mendix/generator-mendix.git
 /*jshint -W069,-W097*/
 "use strict";
 
@@ -18,7 +18,8 @@ var gulp = require("gulp"),
     jsonTransform = require("gulp-json-transform"),
     intercept = require("gulp-intercept"),
     argv = require("yargs").argv,
-    widgetBuilderHelper = require("widgetbuilder-gulp-helper");
+    widgetBuilderHelper = require("widgetbuilder-gulp-helper"),
+    jsValidate = require("gulp-jsvalidate");
 
 var pkg = require("./package.json"),
     paths = widgetBuilderHelper.generatePaths(pkg),
@@ -45,6 +46,7 @@ gulp.task("compress", ["clean"], function () {
 
 gulp.task("copy:js", function () {
     return gulp.src(["./src/**/*.js"])
+        .pipe(jsValidate())
         .pipe(newer(paths.TEST_WIDGETS_DEPLOYMENT_FOLDER))
         .pipe(gulp.dest(paths.TEST_WIDGETS_DEPLOYMENT_FOLDER));
 });
@@ -69,7 +71,7 @@ gulp.task("icon", function (cb) {
     console.log("\nUsing this file to create a base64 string: " + gutil.colors.cyan(icon));
     gulp.src(icon)
         .pipe(intercept(function (file) {
-            console.log("\nCopy the following to your " + pkg.name + ".xml (after description):\n\n" + gutil.colors.cyan("<icon>") + file.contents.toString("base64") + gutil.colors.cyan("<\\icon>") + "\n");
+            console.log("\nCopy the following to your " + pkg.name + ".xml (after description):\n\n" + gutil.colors.cyan("<icon>") + file.contents.toString("base64") + gutil.colors.cyan("<\/icon>") + "\n");
             cb();
         }));
 });
