@@ -1,12 +1,11 @@
 {
   "name": "CKEditorForMendix",
-  "version": "2.4.2",
+  "version": "2.4.3",
   "description": "A new WYSIWYG editor for Mendix that also has the ability to create MicroFlow links in your HTML output.",
   "license": "Apache License, Version 2",
   "author": "Mendix",
   "private": true,
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "del": "^2.2.2",
     "gulp": "^3.9.1",
