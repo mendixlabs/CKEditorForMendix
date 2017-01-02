@@ -57,6 +57,11 @@
             <category>Behavior</category>
             <description>Whether to automatically create wrapping blocks around inline content inside the document body. (This option is deprecated. Changing the default value (true) might introduce unpredictable usability issues and is highly unrecommended.)</description>
         </property>
+        <property key="enableSpellCheck" type="boolean" required="true" defaultValue="true">
+            <caption>Spell-checker</caption>
+            <category>Behavior</category>
+            <description>Whether to apply the browser's spell checking to the input area.</description>
+        </property>
         <!--
             DOCUMENT
         -->
