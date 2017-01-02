@@ -241,7 +241,8 @@ define([
                 enterMode : this._CKEditor["ENTER_" + this.enterMode],
                 shiftEnterMode : this._CKEditor["ENTER_" + this.shiftEnterMode],
                 // Set paragraph
-                autoParagraph : this.autoParagraph
+                autoParagraph : this.autoParagraph,
+                disableNativeSpellChecker : !this.enableSpellCheck
             };
 
             if (!this.showStatusBar) {
