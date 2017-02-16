@@ -324,6 +324,11 @@
             <category>Images</category>
             <description>This constraint might be used to filter the set of browsable images. (not functional right now)</description>
         </property>
+        <property key="useImageStyleProperty" type="boolean" defaultValue="true">
+            <caption>Use image style size</caption>
+            <category>Images</category>
+            <description>This will use the normal 'style' property on an image to set the dimensions. If you set this false, it will set the width and height as a normal html property. This is sometimes needed when using images in document templates (PDF generation)</description>
+        </property>
         <!--
             COUNT
         -->

@@ -244,6 +244,11 @@ define([
                 config.resize_enabled = false;
             }
 
+            if (!this.useImageStyleProperty) {
+                config.disallowedContent = "img{width,height}";
+                config.extraAllowedContent = "*[data-*];img[width,height]";
+            }
+
             // Autogrow functionality of the editor.
             if (this.width > 0) {
                 config.width = this.width;
@@ -315,6 +320,12 @@ define([
                         }
                     }
                 });
+
+                if (!this.useImageStyleProperty) {
+                    event.editor.filter.addTransformations([
+                        ["img{width,height}: sizeToStyle", "img[width,height]: sizeToAttribute"]
+                    ]);
+                }
 
                 this._updateRendering(callback);
             }));
