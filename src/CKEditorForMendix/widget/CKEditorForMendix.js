@@ -10,11 +10,12 @@ define([
     "dojo/_base/array",
     "dojo/_base/lang",
     "dojo/text",
+    "mendix/validator",
     "CKEditorForMendix/widget/lib/jquery",
     "CKEditorForMendix/widget/lib/ckeditor",
     "dojo/text!CKEditorForMendix/widget/templates/CKEditorForMendix.html",
     "CKEditorForMendix/widget/lib/jquery.oembed"
-], function(declare, _WidgetBase, _TemplatedMixin, dom, domStyle, dojoClass, domConstruct, html, dojoArray, lang, text, _jQuery, _CKEditor, widgetTemplate) {
+], function(declare, _WidgetBase, _TemplatedMixin, dom, domStyle, dojoClass, domConstruct, html, dojoArray, lang, text, validator, _jQuery, _CKEditor, widgetTemplate) {
     "use strict";
 
     var $ = _jQuery.noConflict(true);
@@ -153,28 +154,21 @@ define([
         _executeMf: function(obj, mf, callback) {
             logger.debug(this.id + "._executeMf: ", mf);
             if (obj && mf !== "") {
-                var mfAction = {
+                mx.ui.action(mf, {
                     params: {
                         applyto: "selection",
-                        actionname: mf,
                         guids: [obj.getGuid()]
                     },
                     callback: callback || function() {},
                     error: lang.hitch(this, function(error) {
                         console.log(this.id + ": An error occurred while executing microflow: " + error.description);
                     })
-                };
-                if (!mx.version) {
-                    mfAction.store = {
-                        caller: this.mxform
-                    };
-                }
-                mx.data.action(mfAction, this);
+                }, this);
             }
         },
 
         _editorChange: function(data) {
-            logger.debug(this.id + "._editorChange:");
+            logger.debug(this.id + "._editorChange");
             if (this._contextObj !== null) {
                 this._contextObj.set(this.messageString, data);
             }
