@@ -228,7 +228,7 @@ define([
                 autoGrow_onStartup : true,
                 // Base URL inside CKEditor
                 baseHref : mx.appUrl,
-                imageUploadUrl : "http://localhost/", // not used
+                imageUploadUrl : "https://localhost/", // not used
                 extraPlugins : this._getPlugins(),
                 extraAllowedContent : "*[data-*]",
                 // Set enterMode

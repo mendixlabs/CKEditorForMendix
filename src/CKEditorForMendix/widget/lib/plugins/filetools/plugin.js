@@ -38,7 +38,7 @@
 			editor.on( 'fileUploadRequest', function( evt ) {
 				var fileLoader = evt.data.fileLoader;
 
-				fileLoader.xhr.open( 'POST', fileLoader.uploadUrl, true );
+				// fileLoader.xhr.open( 'POST', fileLoader.uploadUrl, true );
 			}, null, null, 5 );
 
 			// editor.on( 'fileUploadRequest', function( evt ) {
