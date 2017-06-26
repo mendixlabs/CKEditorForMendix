@@ -6,12 +6,12 @@ define([
     "dojo/_base/array",
     "dojo/_base/lang",
     "dojo/text",
-    "CKEditorForMendix/widget/lib/jquery",
-    "CKEditorForMendix/widget/lib/ckeditor_viewer",
+    "jquery",
+    "./lib/ckeditor_viewer",
     "dojo/text!CKEditorForMendix/widget/templates/CKEditorViewerForMendix.html",
-    "CKEditorForMendix/widget/lib/highlight.pack",
+    "./lib/highlight.pack",
 
-    "CKEditorForMendix/widget/lib/dotdot.jquery",
+    "./lib/dotdot.jquery",
 ], function (declare, _WidgetBase, _TemplatedMixin, domStyle, dojoArray, lang, text, _jQuery, _CKEditorViewer, widgetTemplate, hljs) {
     "use strict";
 
@@ -157,5 +157,3 @@ define([
 
     });
 });
-
-require(["CKEditorForMendix/widget/CKEditorViewerForMendix"]);

@@ -19,15 +19,25 @@ var gulp = require("gulp"),
     intercept = require("gulp-intercept"),
     argv = require("yargs").argv,
     widgetBuilderHelper = require("widgetbuilder-gulp-helper"),
-    jsValidate = require("gulp-jsvalidate");
+    jsValidate = require("gulp-jsvalidate"),
+    webpack = require("webpack"),
+    merge = require("webpack-merge"),
+    webpackConfig = require("./webpack.config.js");
+
+var webpackConfigRelease = webpackConfig.map(function(config) {
+    return merge(config, {
+        devtool: false,
+        plugins: [ new webpack.optimize.UglifyJsPlugin() ]
+    });
+});
 
 var pkg = require("./package.json"),
     paths = widgetBuilderHelper.generatePaths(pkg),
     xmlversion = widgetBuilderHelper.xmlversion;
 
-gulp.task("default", function() {
-    gulp.watch("./src/**/*", ["compress"]);
-    gulp.watch("./src/**/*.js", ["copy:js"]);
+gulp.task("default", ["clean", "webpack"], function() {
+    gulp.watch("./src/**/*", ["webpack"]);
+    gulp.watch("./dist/tmp/src/**/*.js", ["copy:js"]);
 });
 
 gulp.task("clean", function () {
@@ -37,15 +47,35 @@ gulp.task("clean", function () {
     ], { force: true });
 });
 
+gulp.task("webpack", function(callback) {
+    webpack(webpackConfig, function(error, stats) {
+        if (error) {
+            throw new gutil.PluginError("webpack", err);
+        }
+        gulp.start("compress");
+        callback()
+    });
+});
+
+gulp.task("release", ["clean"], function(callback) {
+    webpack(webpackConfigRelease, function(error, stats) {
+        if (error) {
+            throw new gutil.PluginError("webpack", err);
+        }
+        gulp.start("compress");
+        callback();
+    });
+});
+
 gulp.task("compress", ["clean"], function () {
-    return gulp.src("src/**/*")
+    return gulp.src("dist/tmp/src/**/*")
         .pipe(zip(pkg.name + ".mpk"))
         .pipe(gulp.dest(paths.TEST_WIDGETS_FOLDER))
         .pipe(gulp.dest("dist"));
 });
 
 gulp.task("copy:js", function () {
-    return gulp.src(["./src/**/*.js"])
+    return gulp.src(["./dist/tmp/src/**/*.js"])
         .pipe(jsValidate())
         .pipe(newer(paths.TEST_WIDGETS_DEPLOYMENT_FOLDER))
         .pipe(gulp.dest(paths.TEST_WIDGETS_DEPLOYMENT_FOLDER));
