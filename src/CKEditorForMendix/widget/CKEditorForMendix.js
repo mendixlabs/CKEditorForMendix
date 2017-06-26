@@ -11,16 +11,16 @@ define([
     "dojo/_base/lang",
     "dojo/text",
     "mendix/validator",
-    "CKEditorForMendix/widget/lib/jquery",
-    "CKEditorForMendix/widget/lib/ckeditor",
+    "jquery",
+    "./lib/ckeditor",
     "dojo/text!CKEditorForMendix/widget/templates/CKEditorForMendix.html",
-    "CKEditorForMendix/widget/lib/jquery.oembed"
+    "./lib/jquery.oembed"
 ], function(declare, _WidgetBase, _TemplatedMixin, dom, domStyle, dojoClass, domConstruct, html, dojoArray, lang, text, validator, _jQuery, _CKEditor, widgetTemplate) {
     "use strict";
 
     var $ = _jQuery.noConflict(true);
 
-    return declare("CKEditorForMendix.widget.CKEditorForMendix", [_WidgetBase, _TemplatedMixin], {
+    return declare("CKEditorForMendix.widget.CKEditorForMendix", [ _WidgetBase, _TemplatedMixin ], {
 
         // Set by the Modeler
         imageUploadMicroflow: "",
@@ -694,5 +694,3 @@ define([
         }
     });
 });
-
-require(["CKEditorForMendix/widget/CKEditorForMendix"]);
