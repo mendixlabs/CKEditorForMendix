@@ -1460,7 +1460,7 @@ Sizzle.matchesSelector = function( elem, expr ) {
 
 Sizzle.contains = function( context, elem ) {
 	// Set document vars if needed
-	if ( ( context.ownerDocument || context ) !== document ) {
+	if ( ( (context && context.ownerDocument) || context ) !== document ) {
 		setDocument( context );
 	}
 	return contains( context, elem );
