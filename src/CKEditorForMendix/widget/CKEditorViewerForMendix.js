@@ -63,6 +63,8 @@ define([
                 html = html.split("__GUID__").join(window.CKEditorViewer.base64.encode(this._contextObj.getGuid()));
 
                 html = html.replace(/(<img.*src=\")(file\?guid=)(\d+)(\".* \/>)/g, lang.hitch(this, this._replaceUrl));
+                html = html.replace(/(<img.*src=\")(file\?target=internal&guid=)(\d+)(\".* \/>)/g, lang.hitch(this, this._replaceUrl));
+                html = html.replace(/(<img.*src=\")(file\?target=internal&guid=)(\d+)(\".*[ \/]?>)/g, lang.hitch(this, this._replaceUrl));
 
                 $(this.domNode).html("");
                 $(this.domNode).append(html);
