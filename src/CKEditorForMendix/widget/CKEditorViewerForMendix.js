@@ -23,11 +23,9 @@ define([
         templateString: widgetTemplate,
 
         _contextObj: null,
-        _handles: null,
         cutOffRules: null,
 
         update: function (obj, callback) {
-            //logger.level(logger.DEBUG);
             logger.debug(this.id + ".update");
 
             this._contextObj = obj;
@@ -53,6 +51,9 @@ define([
                   html = "";
                 }
 
+                var replaceUrlRegEx = /(<img.*src=\")(file\?guid=)(\d+)(\".* \/>)/g;
+                var replaceSrcRegEx = /(src=")([/]?file\?(target=internal&)?guid=)(\d+)(&target=internal)?(\")/g;
+
                 // Set the content of the link.
                 window.CKEditorViewer.data[this.id] = {};
                 window.CKEditorViewer.data[this.id].microflowLinks = this.microflowLinks;
@@ -62,7 +63,8 @@ define([
                 html = html.split("__ID__").join(window.CKEditorViewer.base64.encode(this.id));
                 html = html.split("__GUID__").join(window.CKEditorViewer.base64.encode(this._contextObj.getGuid()));
 
-                html = html.replace(/(<img.*src=\")(file\?guid=)(\d+)(\".* \/>)/g, lang.hitch(this, this._replaceUrl));
+                html = html.replace(replaceUrlRegEx, lang.hitch(this, this._replaceUrl));
+                html = html.replace(replaceSrcRegEx, lang.hitch(this, this._replaceSrc));
 
                 $(this.domNode).html("");
                 $(this.domNode).append(html);
@@ -105,6 +107,10 @@ define([
             return p1 + this._getFileUrl(p3) + p4;
         },
 
+        _replaceSrc: function (match, p1, p2, p3, p4, p5, p6, offset, string) {
+            return p1 + this._getFileUrl(p4) + p6;
+        },
+
         _getFileUrl: function (guid) {
             var changedDate = Math.floor(Date.now() / 1); // Right now;
             if (mx.data.getDocumentUrl) {
@@ -121,30 +127,23 @@ define([
             var objHandle = null,
                 attrHandle = null;
 
-            // Release handles on previous object, if any.
-            if(this._handles){
-                dojoArray.forEach(this._handles, lang.hitch(this, function (handle) {
-                    this.unsubscribe(handle);
-                }));
-            }
+            this.unsubscribeAll();
 
             if (this._contextObj) {
-                objHandle = this.subscribe({
+                this.subscribe({
                     guid: this._contextObj.getGuid(),
                     callback: lang.hitch(this,function(guid) {
                         this._updateRendering();
                     })
                 });
 
-                attrHandle = this.subscribe({
+                this.subscribe({
                     guid: this._contextObj.getGuid(),
                     attr: this.messageString,
                     callback: lang.hitch(this,function(guid,attr,attrValue) {
                         this._updateRendering();
                     })
                 });
-
-                this._handles = [objHandle, attrHandle];
             }
         },
 
