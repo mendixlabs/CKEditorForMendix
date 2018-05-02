@@ -3,9 +3,9 @@
  *
  * Copyright (c) 2009 Richard Chamorro
  * Licensed under the MIT license
- * 
- * Orignal Author: Richard Chamorro 
- * Forked by Andrew Mee to Provide a slightly diffent kind of embedding 
+ *
+ * Orignal Author: Richard Chamorro
+ * Forked by Andrew Mee to Provide a slightly diffent kind of embedding
  * experience
  */
 (function($) {
@@ -115,7 +115,7 @@
         useResponsiveResize: false,
         includeHandle: true,
         embedMethod: 'auto',
-        // "auto", "append", "fill"		
+        // "auto", "append", "fill"
         onProviderNotFound: function() {
         },
         beforeEmbed: function() {
@@ -539,7 +539,7 @@
                     apiendpoint: this.apiendpoint,
                     url: function(externalurl) { return this.apiendpoint + '?format=json&url=' + externalurl; },
                     datareturn: function(results) {
-						
+
 						if (results.json.type != 'video' && (results.json.url || results.json.thumbnail_url) && !results.json.html.indexOf("iframe") ) {
                             return '<img src="' + (results.json.url || results.json.thumbnail_url) + '"  />';
                         } else if (results.json.html.indexOf("iframe")) {
@@ -588,7 +588,7 @@
                                     height = settings.maxHeight;
                                     width = settings.maxWidth;
 
-                                    
+
                                 }
 
                             }
@@ -720,7 +720,7 @@
         new $.fn.oembed.OEmbedProvider("VHX", "video", ["vhx.tv/.+"], "http://vhx.tv/services/oembed.json"),
         new $.fn.oembed.OEmbedProvider("bambuser", "video", ["bambuser.com/.+"], "http://api.bambuser.com/oembed/iframe.json"),
         new $.fn.oembed.OEmbedProvider("justin.tv", "video", ["justin.tv/.+"], 'http://api.justin.tv/api/embed/from_url.json', { useYQL: 'json' }),
-        //Audio 
+        //Audio
         new $.fn.oembed.OEmbedProvider("official.fm", "rich", ["official.fm/.+"], 'http://official.fm/services/oembed', { useYQL: 'json' }),
         new $.fn.oembed.OEmbedProvider("chirbit", "rich", ["chirb.it/.+"], 'http://chirb.it/oembed.json', { useYQL: 'json' }),
         new $.fn.oembed.OEmbedProvider("Huffduffer", "rich", ["huffduffer.com/[-.\\w@]+/\\d+"], "http://huffduffer.com/oembed"),
@@ -858,16 +858,6 @@
                 return '<div id="content"><h3><a class="nav-link" href="http://en.wikipedia.org/wiki/' + data.parse['displaytitle'] + '">' + data.parse['displaytitle'] + '</a></h3>' + text + '</div>';
             }
         }),
-        new $.fn.oembed.OEmbedProvider("imdb", "rich", ["imdb.com/title/.+"], "http://www.imdbapi.com/?i=$1&callback=?",
-            {
-                templateRegex: /.*\/title\/([^\/]+).*/,
-                templateData: function(data) {
-                    if (!data.Title) {
-                        return false;
-                    }
-                    return '<div id="content"><h3><a class="nav-link" href="http://imdb.com/title/' + data.ID + '/">' + data.Title + '</a> (' + data.Year + ')</h3><p>Starring: ' + data.Actors + '</p><div id="photo-wrap" style="margin: auto;width:600px;height:450px;"><img class="photo" id="photo-display" src="' + data.Poster + '" alt="' + data.Title + '"></div>  <div id="view-photo-caption">' + data.Plot + '</div></div>';
-                }
-            }),
         new $.fn.oembed.OEmbedProvider("livejournal", "rich", ["livejournal.com/"], "http://ljpic.seacrow.com/json/$2$4?jsonp=?", {
             templateRegex: /(http:\/\/(((?!users).)+)\.livejournal\.com|.*users\.livejournal\.com\/([^\/]+)).*/,
             templateData: function(data) {
