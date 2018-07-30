@@ -8,7 +8,7 @@
  * Forked by Andrew Mee to Provide a slightly diffent kind of embedding experience
  */
  (function(root, factory) {
-     define(['CKEditorForMendix/widget/lib/jquery'], factory);
+     define(['CKEditorForMendix/widget/lib/jquery.min'], factory);
  }(this, function(jQuery) {
     (function ($) {
         $.fn.oembed = function (url, options, embedAction) {

@@ -11,7 +11,7 @@ define([
     "dojo/_base/lang",
     "dojo/text",
     "mendix/validator",
-    "CKEditorForMendix/widget/lib/jquery",
+    "CKEditorForMendix/widget/lib/jquery.min",
     "CKEditorForMendix/widget/lib/ckeditor",
     "dojo/text!CKEditorForMendix/widget/templates/CKEditorForMendix.html",
     "CKEditorForMendix/widget/lib/jquery.oembed"

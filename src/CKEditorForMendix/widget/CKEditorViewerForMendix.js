@@ -6,7 +6,7 @@ define([
     "dojo/_base/array",
     "dojo/_base/lang",
     "dojo/text",
-    "CKEditorForMendix/widget/lib/jquery",
+    "CKEditorForMendix/widget/lib/jquery.min",
     "CKEditorForMendix/widget/lib/ckeditor_viewer",
     "dojo/text!CKEditorForMendix/widget/templates/CKEditorViewerForMendix.html",
     "CKEditorForMendix/widget/lib/highlight.pack",
