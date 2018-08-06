@@ -12,8 +12,13 @@
         lang: ['de', 'en', 'nl', 'fr', 'ru'],
         init: function(editor) {
             // Load jquery?
+
+            if (CKEDITOR.jQuery) {
+                jQuery = CKEDITOR.jQuery;
+            }
+
             if (typeof(jQuery) == 'undefined') {
-                CKEDITOR.scriptLoader.load('http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js', function() {
+                CKEDITOR.scriptLoader.load(window.CKEDITOR_BASEPATH + 'jquery.min.js', function () {
                     if (typeof(jQuery.fn.oembed) == 'undefined') {
                         CKEDITOR.scriptLoader.load(CKEDITOR.getUrl(CKEDITOR.plugins.getPath('oembed') + 'libs/jquery.oembed.min.js'));
                     }
@@ -40,7 +45,7 @@
                             alert(editor.lang.oembed.invalidUrl);
                             return false;
                         }
-                        
+
                         var width = this.getContentElement('general', 'width').getInputElement().getValue();
                         var height = this.getContentElement('general', 'height').getInputElement().getValue();
                         var editorInstance = this.getParentEditor();
@@ -49,7 +54,7 @@
                                 if (typeof e.code === 'string') {
                                     editorInstance.insertHtml(editor.config.oembed_WrapperClass != null ? '<div class="' + editor.config.oembed_WrapperClass + '" />' : '<div />');
                                     editorInstance.insertHtml(e.code);
-                                    
+
                                     CKEDITOR.dialog.getCurrent().hide();
                                 } else {
                                     alert(editor.lang.oembed.noEmbedCode);
@@ -76,7 +81,7 @@
                                 },
                                 label: editor.lang.oembed.url,
                                 title: editor.lang.oembed.pasteUrl
-                                
+
                             }, {
                                 type: 'hbox',
                                 widths: ['50%', '50%'],
