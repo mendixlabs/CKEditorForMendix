@@ -11,7 +11,7 @@ define([
     "dojo/_base/lang",
     "dojo/text",
     "mendix/validator",
-    "CKEditorForMendix/widget/lib/jquery",
+    "CKEditorForMendix/widget/lib/jquery.min",
     "CKEditorForMendix/widget/lib/ckeditor",
     "dojo/text!CKEditorForMendix/widget/templates/CKEditorForMendix.html",
     "CKEditorForMendix/widget/lib/jquery.oembed"
@@ -110,7 +110,7 @@ define([
                 this._executeCallback(callback, "update");
             } else {
                 this._resetSubscriptions();
-                this._updateRendering(callback);
+                this._updateRendering(callback, "update");
             }
         },
 
@@ -127,11 +127,13 @@ define([
             }));
 
             this._editor.on("focus", lang.hitch(this, function(e) {
+                logger.debug(this.id + "focus");
                 this._focus = true;
             }));
 
             //On blur (unselecting the textbox) event
             this._editor.on("blur", lang.hitch(this, function(e) {
+                logger.debug(this.id + "blur");
                 this._focus = false;
                 if (this._editor.mode !== "source" && this._editor.checkDirty() && this.onChangeMicroflow && !this._strReadOnly()) {
                     this._executeMf(this._contextObj, this.onChangeMicroflow, lang.hitch(this, function (obj) {
@@ -294,6 +296,7 @@ define([
             };
 
             this._setupEvents();
+            this._ckConfig = config;
 
             this._editor.on("instanceReady", lang.hitch(this, function(event) {
                 logger.debug(this.id + "._createChildNodes editor ready, total height: " + $("#" + this.id).height() + ", calling _updateRendering");
@@ -327,7 +330,7 @@ define([
                     ]);
                 }
 
-                this._updateRendering(callback);
+                this._updateRendering(callback, "editor instance ready");
             }));
 
             if (this._useImageUpload) {
@@ -559,7 +562,7 @@ define([
 
         _updateAttrRendering: function() {
             if (!this._focus) {
-                this._updateRendering();
+                this._updateRendering(null, "_updateAttrRendering");
             }
         },
 
@@ -567,8 +570,8 @@ define([
             return this._contextObj.isReadonlyAttr && this._contextObj.isReadonlyAttr(this.messageString);
         },
 
-        _updateRendering: function(callback) {
-            logger.debug(this.id + "._updateRendering");
+        _updateRendering: function(callback, from) {
+            logger.debug(this.id + "._updateRendering" + (from ? " from: " + from : ""));
 
             if (!this._editor && !this._isReadOnly) {
                 this._createChildNodes(callback);
@@ -609,7 +612,7 @@ define([
                 objHandle = this.subscribe({
                     guid: this._contextObj.getGuid(),
                     callback: lang.hitch(this, function(guid) {
-                        this._updateRendering();
+                        this._updateRendering(null, "subscription");
                     })
                 });
 

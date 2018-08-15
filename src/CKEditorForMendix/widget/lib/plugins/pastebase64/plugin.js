@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
     'use strict';
 
     CKEDITOR.plugins.add('pastebase64', {
@@ -14,7 +14,9 @@
 
         editor.on("contentDom", function () {
             var editableElement = editor.editable ? editor.editable() : editor.document;
-            editableElement.on("paste", onPaste, null, {editor: editor});
+            editableElement.on("paste", onPaste, null, {
+                editor: editor
+            });
         });
 
 
@@ -27,7 +29,12 @@
         var found = false;
         var imageType = /^image/;
 
-        if (!clipboardData) {
+        if (!clipboardData ||
+            //IE 11 doesn't even fire this paste event but paste base64 natively
+            clipboardData.mozItemCount || //Firefox will paste base64 natively
+            ((clipboardData.types instanceof Array || Array.isArray(clipboardData.types)) && clipboardData.types.indexOf("text/html") > -1) || //Chrome has HTML to paste instead
+            ((clipboardData.types instanceof DOMStringList || Object.prototype.toString.call(clipboardData.types) == '[object DOMStringList]') && clipboardData.types.contains("text/html")) //Edge has HTML to paste instead
+        ) {
             return;
         }
 
