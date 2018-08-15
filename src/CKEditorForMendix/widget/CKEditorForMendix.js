@@ -37,7 +37,6 @@ define([
         // Extra variables
         _extraContentDiv: null,
         _editor: null,
-        _editorBookmark: null,
         _resizePopup: true,
         _useImageUpload: false,
         _imageEntity: "",
@@ -151,15 +150,6 @@ define([
                         this._editor.fire("change");
                     }));
                 }
-            }));
-
-            this._editor.on("contentDom", lang.hitch(this, function () {
-                logger.debug(this.id + "contentDom");
-                // var editable = this._editor.editable();
-                // editable.attachListener(editable, 'keyup', lang.hitch(this, function (e) {
-                //     var selection = this._editor.getSelection();
-                //     this._editorBookmark = selection.createBookmarks(true);
-                // }));
             }));
         },
 
@@ -593,12 +583,6 @@ define([
 
                         this._editor.setData(this._contextObj.get(this.messageString));
                         this._editor.setReadOnly(this._strReadOnly());
-
-                        if (this._editorBookmark) {
-                            // console.log(this._editorBookmark);
-                            // this._editor.getSelection().selectBookmarks(this._editorBookmark);
-                            // this._editorBookmark = null;
-                        }
 
                     } else {
                         logger.warn(this.id + " - Unable to add contents to editor, no _editor object available");
