@@ -1,15 +1,15 @@
 ﻿/* Mendix CKEditor paths */
 ((function () {
     console.log('CKEDITOR SCRIPT LOADING.');
-    if (typeof window.mxmob !== 'undefined') {
+    if (typeof mx.appUrl !== "undefined") {
+        window.CKEDITOR_BASEPATH = mx.appUrl + 'widgets/CKEditorForMendix/widget/lib/';
+    } else if (typeof window.mxmob !== 'undefined') {
         window.CKEDITOR_BASEPATH = window.mxmob.app._currentURL + 'widgets/CKEditorForMendix/widget/lib/';
         window.mxmob.ui.alert(window.CKEDITOR_BASEPATH);
-    } else {
-        if (typeof window.mxapp !== 'undefined') {
-            window.CKEDITOR_BASEPATH = window.mxapp._appUrl + 'widgets/CKEditorForMendix/widget/lib/';
-        } else if (typeof window.mx !== 'undefined') {
-            window.CKEDITOR_BASEPATH = mx.appUrl + 'widgets/CKEditorForMendix/widget/lib/';
-        }
+    } else if (typeof window.mxapp !== 'undefined' && typeof window.mxapp._appUrl !== "undefined") {
+        window.CKEDITOR_BASEPATH = window.mxapp._appUrl + 'widgets/CKEditorForMendix/widget/lib/';
+    } else if (typeof window.mx !== 'undefined') {
+        window.CKEDITOR_BASEPATH = mx.appUrl + 'widgets/CKEditorForMendix/widget/lib/';
     }
 }()));
 
