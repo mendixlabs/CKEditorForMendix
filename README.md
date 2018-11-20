@@ -4,7 +4,7 @@ This [widget](https://appstore.home.mendix.com/link/app/1715/Mendix/CKEditor-For
 
 ![test](https://github.com/mendix/CKEditorForMendix/raw/master/assets/mendix_button.png)
 
-Current [CKEditor version](http://ckeditor.com/whatsnew): 4.5.4
+Current [CKEditor version](http://ckeditor.com/whatsnew): 4.10.0
 
 ## Contributing
 
