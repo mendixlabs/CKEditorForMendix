@@ -1,6 +1,6 @@
 {
   "name": "CKEditorForMendix",
-  "version": "2.5.1",
+  "version": "2.5.2",
   "description": "A new WYSIWYG editor for Mendix that also has the ability to create MicroFlow links in your HTML output.",
   "license": "Apache License, Version 2",
   "author": "Mendix",
@@ -24,10 +24,11 @@
   },
   "generatorVersion": "2.0.4",
   "paths": {
-    "testProjectFolder": "./test/",
-    "testProjectFileName": "Test.mpr"
+    "testProjectFolder": "./Test7/",
+    "testProjectFileName": "App.mpr"
   },
   "scripts": {
+    "dev": "node ./node_modules/gulp/bin/gulp",
     "build": "node ./node_modules/gulp/bin/gulp build",
     "version": "node ./node_modules/gulp/bin/gulp version",
     "icon": "node ./node_modules/gulp/bin/gulp icon",

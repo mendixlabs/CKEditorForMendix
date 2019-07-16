@@ -151,6 +151,14 @@ define([
                     }));
                 }
             }));
+            var self = this;
+            this._editor.on("loaded", function() {
+                var content = $(".cke_contents", this.domNode);
+                content.click(function() {
+                    console.log("focused click");
+                    self._editor.focus();
+                });
+            });
         },
 
         _executeMf: function(obj, mf, callback) {
