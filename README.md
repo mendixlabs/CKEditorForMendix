@@ -66,3 +66,25 @@ The widget has a few options that you can set as default behaviour in the CKEdit
 ## Embedding
 
 The widget supports embedding of video's. This can be used by clicking ![imagebrowser](https://github.com/mendix/CKEditorForMendix/raw/master/assets/oembed.png). It will automatically create an embed code when you enter the url of the a video (for example YouTube or Vimeo). For more details on what is supported, please see the [plugin page](http://ckeditor.com/addon/oembed)
+
+## Development
+
+### Upgrading jquery
+
+Make sure to remove "jquery" module identifier from (unminified):
+```
+if ( typeof define === "function" && define.amd ) {
+	define( "jquery", [], function() {
+		return jQuery;
+	} );
+}
+```
+
+So it looks like this:
+```
+if ( typeof define === "function" && define.amd ) {
+	define([], function() {
+		return jQuery;
+	} );
+}
+```
