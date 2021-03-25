@@ -1,4 +1,4 @@
-# CKEditor for Mendix [![Support](https://img.shields.io/badge/Mendix%20Support%3A-Community-green.svg)](https://docs.mendix.com/community/app-store/app-store-content-support)
+# CKEditor for Mendix [![Support](https://img.shields.io/badge/Mendix%20Support%3A-Community-green.svg)](https://docs.mendix.com/appstore/general/app-store-content-support#community-category)
 
 This [widget](https://appstore.home.mendix.com/link/app/1715/Mendix/CKEditor-For-Mendix) gives you a full version of the CKEditor with an extra button that allows you to create microflow links inside your HTML output.
 
