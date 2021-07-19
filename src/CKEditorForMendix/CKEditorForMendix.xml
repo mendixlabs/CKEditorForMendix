@@ -62,6 +62,33 @@
             <category>Behavior</category>
             <description>Whether to apply the browser's spell checking to the input area.</description>
         </property>
+        <property key="enableScayt" type="boolean" required="true" defaultValue="false">
+            <caption>Enable SCAYT</caption>
+            <category>Behavior</category>
+            <description>Enable Spell Check AS You Type.</description>
+        </property>
+        <property key="scaytLanguage" type="enumeration" defaultValue="default">
+            <caption>SCAYT Language</caption>
+            <category>Behavior</category>
+            <description>Default language for SCAYT. Default will store and apply the user selection from the UI.</description>
+            <enumerationValues>
+                <enumerationValue key="default">Default</enumerationValue>
+                <enumerationValue key="en_US">American English</enumerationValue>
+                <enumerationValue key="en_GB">British English</enumerationValue>
+                <enumerationValue key="en_CA">Canadian English</enumerationValue>
+                <enumerationValue key="fr_CA">Canadian French</enumerationValue>
+                <enumerationValue key="da_DK">Danish</enumerationValue>
+                <enumerationValue key="nl_NL">Dutch</enumerationValue>
+                <enumerationValue key="fi_FI">Finnish</enumerationValue>
+                <enumerationValue key="fr_FR">French</enumerationValue>
+                <enumerationValue key="de_DE">German</enumerationValue>
+                <enumerationValue key="el_GR">Greek</enumerationValue>
+                <enumerationValue key="it_IT">Italian</enumerationValue>
+                <enumerationValue key="nb_NO">Norwegian Bokmal</enumerationValue>
+                <enumerationValue key="es_ES">Spanish</enumerationValue>
+                <enumerationValue key="sv_SE">Swedish</enumerationValue>
+            </enumerationValues>
+        </property>
         <!--
             DOCUMENT
         -->
