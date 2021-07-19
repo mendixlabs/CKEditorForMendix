@@ -246,8 +246,15 @@ define([
                 shiftEnterMode : this._CKEditor["ENTER_" + this.shiftEnterMode],
                 // Set paragraph
                 autoParagraph : this.autoParagraph,
-                disableNativeSpellChecker : !this.enableSpellCheck
+                disableNativeSpellChecker : !this.enableSpellCheck,
+                scayt_autoStartup : this.enableScayt
             };
+
+            if (this.scaytLanguage !== "default") {
+                // Specifying a default language only works when user selection is not stored
+                config.scayt_disableOptionsStorage = 'lang';
+                config.scayt_sLang = this.scaytLanguage;
+            }
 
             if (!this.showStatusBar) {
                 config.removePlugins = "elementspath";
