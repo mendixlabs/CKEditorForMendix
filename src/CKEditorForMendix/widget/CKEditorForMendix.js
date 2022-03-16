@@ -153,7 +153,7 @@ define([
             }));
             var self = this;
             this._editor.on("loaded", function() {
-                var content = $(".cke_contents", this.domNode);
+                var content = $("." + this.id + " .cke_contents"); 
                 content.click(function() {
                     console.log("focused click");
                     self._editor.focus();
